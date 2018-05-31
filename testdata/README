@@ -1,0 +1,9 @@
+test_2_mend.sdf and test_14_mend.sdf contain molblocks from mainlib.sdf, an SDF
+file from NIST. The actual mass spectra data has been removed from these SDF
+files, and replaced with fake data.
+
+test_14_record.gz is a TFRecord with features 'molecule weight', 'atom weights',
+'circular_fp_1024', 'dense_mass_spec'
+
+NB : Since 2 molecules will not pass the filters in get_sdf_to_mol, there will
+only be 12 molecules into the TFRecord file.
