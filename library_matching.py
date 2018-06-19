@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Evaluation metric for accuracy of library matching."""
 
 from __future__ import absolute_import
@@ -25,7 +24,6 @@ import mass_spec_constants as ms_constants
 import util
 import numpy as np
 import tensorflow as tf
-
 
 FP_NAME_FOR_JACCARD_SIMILARITY = str(
     ms_constants.CircularFingerprintKey(fmap_constants.CIRCULAR_FP_BASENAME,
@@ -76,48 +74,127 @@ class LibraryMatchingData(
                                                    query)
 
 
+def _invert_permutation(perm):
+  """Convert an array of permutations to an array of inverse permutations.
+
+  Args:
+    perm: a [batch_size, num_iterms] int array where each column is a
+      permutation.
+  Returns:
+    A [batch_size, num_iterms] int array where each column is the
+    inverse permutation of the corresponding input column.
+  """
+
+  output = np.empty(shape=perm.shape, dtype=perm.dtype)
+  output[np.arange(perm.shape[0])[..., np.newaxis], perm] = np.arange(
+      perm.shape[1])[np.newaxis, ...]
+  return output
+
+
 def _find_query_rank_helper(similarities, library_keys, query_keys):
   """Find rank of query key when we sort library_keys by similarities.
 
+  Note that the behavior of this function is not well defined when there
+  are ties along a row of similarities.
+
   Args:
-    similarities: [batch_size, num_library_elements] float Tensor. These
-      are not assumed to be sorted in any way.
-    library_keys: [num_library_elements] string Tensor, where each column j of
+    similarities: [batch_size, num_library_elements] float array. These are not
+      assumed to be sorted in any way.
+    library_keys: [num_library_elements] string array, where each column j of
       similarities corresponds to library_key j.
-    query_keys: [num_queries] string Tensor
+    query_keys: [num_queries] string array.
+
   Returns:
-    best_rank_of_query_in_sorted_list: [batch_size] int32 Tensor containing
-      for each batch the lowest index of a library key that matches the query
+    highest_rank: A [batch_size] tf.int32  np array containing
+      for each batch the highest index of a library key that matches the query
       key for that batch element when the library keys are sorted in descending
       order by similarity score.
+    lowest_rank: similar to highest_rank, but the lowest index of a library key
+      matchign the query.
+    avg_rank: A [batch_size] tf.float32 array containing the average index
+      of all library keys matching the query.
     best_query_similarities: the value of the similarities evaluated at
-      best_rank_of_query_in_sorted_list
+      the lowest_rank position.
   Raises:
     ValueError: if there is a query key does not exist in the set of library
       keys.
   """
+
+  def _masked_rowwise_max(data, mask):
+    data = np.copy(data)
+    min_value = np.min(data) - 1
+    data[~mask] = min_value
+    return np.max(data, axis=1)
+
+  def _masked_rowwise_min(data, mask):
+    data = np.copy(data)
+    max_value = np.max(data) + 1
+    data[~mask] = max_value
+    return np.min(data, axis=1)
+
+  def _masked_rowwise_mean(data, mask):
+    masked_data = data * mask
+    rowwise_value_sum = np.float32(np.sum(masked_data, axis=1))
+    rowwise_count = np.sum(mask, axis=1)
+    return rowwise_value_sum / rowwise_count
+
   library_key_matches_query = (
       library_keys[np.newaxis, ...] == query_keys[..., np.newaxis])
   if not np.all(np.any(library_key_matches_query, axis=1)):
     raise ValueError('Not all query keys appear in the library.')
 
-  masked_similarities = np.where(library_key_matches_query, similarities,
-                                 np.finfo(np.float32).min)
-  best_query_similarities = np.max(masked_similarities, axis=1)
+  ranks = _invert_permutation(np.argsort(-similarities, axis=1))
 
-  similarity_is_greater_than_query = (
-      similarities > best_query_similarities[..., np.newaxis])
-  best_rank_of_query_in_sorted_list = np.sum(
-      similarity_is_greater_than_query, axis=1, dtype=np.int32)
-  return best_rank_of_query_in_sorted_list, best_query_similarities
+  highest_rank = _masked_rowwise_max(ranks, library_key_matches_query)
+  lowest_rank = _masked_rowwise_min(ranks, library_key_matches_query)
+  avg_rank = _masked_rowwise_mean(ranks, library_key_matches_query)
+
+  highest_rank = np.int32(highest_rank)
+  lowest_rank = np.int32(lowest_rank)
+  avg_rank = np.float32(avg_rank)
+
+  best_query_similarities = _masked_rowwise_max(similarities,
+                                                library_key_matches_query)
+
+  return (highest_rank, lowest_rank, avg_rank, best_query_similarities)
 
 
 def _find_query_rank(similarities, library_keys, query_keys):
-  """See docstring for _find_query_rank_helper."""
-  return tf.py_func(
+  """tf.py_func wrapper around _find_query_rank_helper.
+
+  Args:
+    similarities: [batch_size, num_library_elements] float Tensor. These are not
+      assumed to be sorted in any way.
+    library_keys: [num_library_elements] string Tensor, where each column j of
+      similarities corresponds to library_key j.
+    query_keys: [num_queries] string Tensor
+  Returns:
+    query_ranks: a dictionary with keys 'highest', 'lowest' and 'avg', where
+      each value is a [batch_size] Tensor. The 'lowest' Tensor contains
+      for each batch the lowest index of a library key that matches the query
+      key for that batch element when the library keys are sorted in descending
+      order by similarity score. The 'highest' and 'avg'
+      Tensors are defined similarly. The first two are tf.int32 and the
+      final is a tf.float32.
+
+      Note that the behavior of these metrics is undefined when there are ties
+      within a row of similarities.
+    best_query_similarities: the value of the similarities evaluated at
+      the lowest query rank.
+  """
+
+  (highest_rank, lowest_rank, avg_rank, best_query_similarities) = tf.py_func(
       _find_query_rank_helper, [similarities, library_keys, query_keys],
-      (tf.int32, tf.float32),
+      (tf.int32, tf.int32, tf.float32, tf.float32),
       stateful=False)
+
+  query_ranks = {
+      'highest': highest_rank,
+      'lowest': lowest_rank,
+      'avg': avg_rank
+  }
+
+  return query_ranks, best_query_similarities
 
 
 def _max_similarity_match(library,
@@ -138,20 +215,28 @@ def _max_similarity_match(library,
     query: [num_queries, feature_dim] Tensor
     similarity_provider: a similarity.SimilarityProvider instance
     library_filter: [num_elements, num_queries] Bool Tensor. Query j is
-      permitted to be matched to library element i if
-      library_filter[i, j] is True. Unused if None.
+      permitted to be matched to library element i if library_filter[i, j] is
+      True. Unused if None.
     library_keys: tf.string Tensor of the ids of the library elements
     query_keys: tf.string Tensor of the ids of the queries
+
   Returns:
     argmax: [num_queries] tf.int32 Tensor containing indices of maximum inner
       product between each query and the library.
     best_similarities: [num_queries] tf.float32 Tensor containing the value of
       the maximum inner products.
-    query_ranks: [num_queries] tf.int32 Tensor of the rank of the query keys
-      if we were to sort the library keys by similarity. Returns None if either
-      library_keys or query_keys is None.
+    query_ranks: a dictionary with keys 'highest', 'lowest' and 'avg', where
+      each value is a [batch_size] Tensor. The 'lowest' Tensor contains
+      for each batch the lowest index of a library key that matches the query
+      key for that batch element when the library keys are sorted in descending
+      order by similarity score. The 'highest' and 'avg'
+      Tensors are defined similarly. The first two are tf.int32 and the
+      final is a tf.float32.
+
+      Note that the behavior of these metrics is undefined when there are ties
+      within a row of similarities.
     query_similarities: [num_queries] corresponding similarities for the
-      ranks in query_ranks.
+      'lowest' ranks in query_ranks above.
     library_entry_of_predictions: [num_queries, feature_dim] Tensor
   """
 
@@ -325,6 +410,7 @@ def library_matching(combined_data,
       that the queries were matched to.
     library_entry_of_prediction: float Tensor containing the library spectra
       that is the best match for the query
+    num_library_elements: int
   """
   observed_dict = combined_data.observed
   predicted_dict = combined_data.predicted
@@ -367,7 +453,10 @@ def library_matching(combined_data,
       FP_NAME_FOR_JACCARD_SIMILARITY: predicted_fingerprints,
       'similarity': best_similarities,
   }
-  return true_data, predicted_data, library_entry_of_prediction
+  num_library_elements = full_library_ids.shape[0].value
+
+  return (true_data, predicted_data, library_entry_of_prediction,
+          num_library_elements)
 
 
 def _log_predictions(true_keys, predicted_keys, ranks, global_step, log_dir):
@@ -433,19 +522,21 @@ def library_match_accuracy(combined_data,
         library_entry_of_prediction.
   """
 
-  true_data, predicted_data, library_entry_of_prediction = library_matching(
-      combined_data, predictor_fn, similarity_provider, mass_tolerance,
-      eval_batch_size)
+  (true_data, predicted_data,
+   library_entry_of_prediction, num_library_elements) = library_matching(
+       combined_data, predictor_fn, similarity_provider, mass_tolerance,
+       eval_batch_size)
 
   true_inchikeys = true_data[fmap_constants.INCHIKEY]
   predicted_inchikeys = predicted_data[fmap_constants.INCHIKEY]
-  query_ranks = true_data['rank']
+
+  best_query_ranks = true_data['rank']['lowest']
 
   metrics_dict = {}
 
   if log_dir is not None:
     metrics_dict['prediction_logging'] = _make_logging_ops(
-        true_inchikeys, predicted_inchikeys, query_ranks, log_dir)
+        true_inchikeys, predicted_inchikeys, best_query_ranks, log_dir)
 
   correct_prediction = tf.equal(true_inchikeys, predicted_inchikeys)
   metrics_dict['library_matching_accuracy'] = tf.metrics.mean(
@@ -462,13 +553,33 @@ def library_match_accuracy(combined_data,
   metrics_dict['ground_truth_similarity'] = tf.metrics.mean(
       true_data['similarity'])
 
-  metrics_dict['average_query_rank'] = tf.metrics.mean(query_ranks)
+  metrics_dict['average_query_rank'] = tf.metrics.mean(best_query_ranks)
 
   for i in [5, 10, 25, 50, 100]:
-    metrics_dict['recall@%d' % i] = tf.metrics.mean(query_ranks < i)
+    metrics_dict['recall@%d' % i] = tf.metrics.mean(best_query_ranks < i)
 
   metrics_dict['mean_reciprocal_rank'] = tf.metrics.mean(
-      tf.pow(tf.to_float(query_ranks) + 1, -1))
+      tf.pow(tf.to_float(best_query_ranks) + 1, -1))
+
+  avg_query_ranks = true_data['rank']['avg']
+  metrics_dict['avg-rank-average_query_rank'] = tf.metrics.mean(avg_query_ranks)
+
+  num_candidates_with_better_scores = true_data['rank']['lowest']
+  num_candidates_with_worse_scores = (
+      num_library_elements - 1 - true_data['rank']['highest'])
+  num_candidates_with_worse_scores = tf.maximum(
+      num_candidates_with_worse_scores, 0)
+
+  relative_ranking_position = 0.5 * (
+      1 +
+      (num_candidates_with_better_scores - num_candidates_with_worse_scores) /
+      (num_library_elements - 1))
+  metrics_dict['relative_ranking_position'] = tf.metrics.mean(
+      relative_ranking_position)
+
+  for i in [5, 10, 25, 50, 100]:
+    metrics_dict['avg-rank-recall@%d' %
+                 i] = tf.metrics.mean(avg_query_ranks < i)
 
   return (metrics_dict, library_entry_of_prediction,
           predicted_data[fmap_constants.INCHIKEY])

@@ -461,13 +461,17 @@ class SmilesRNNSpectraPrediction(MassSpectraPrediction):
     processed_features = tf.nn.embedding_lookup(
         embedding_table, feature_dict[fmap_constants.SMILES])
 
-    rnn_cell = tf.nn.rnn_cell.LSTMCell(hparams.num_rnn_hidden_units)
-    rnn_outputs, _ = tf.nn.dynamic_rnn(
-        rnn_cell,
+    fw_rnn_cell = tf.nn.rnn_cell.LSTMCell(hparams.num_rnn_hidden_units)
+    bw_rnn_cell = tf.nn.rnn_cell.LSTMCell(hparams.num_rnn_hidden_units)
+    rnn_outputs, _ = tf.nn.bidirectional_dynamic_rnn(
+        fw_rnn_cell,
+        bw_rnn_cell,
         processed_features,
         sequence_length=sequence_length,
-        initial_state=None,
         dtype=tf.float32)
+
+    # Concatenate forward and backward outputs
+    rnn_outputs = tf.concat(rnn_outputs, 2)
 
     if hparams.average_rnn_outputs:
       rnn_outputs = (

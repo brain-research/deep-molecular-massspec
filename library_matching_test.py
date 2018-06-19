@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for deep_molecular_massspec.library_matching."""
 
 from __future__ import absolute_import
@@ -66,19 +65,49 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
     query_keys = np.array(['a', 'b', 'c', 'a', 'b', 'c'])
 
     similarities = np.array(
-        [[3., 4., 6., 0., 0., 2.], [1., -1., 5., 3, 2., 1.],
-         [-5., 0., 2., 0., 3., 1.], [0.2, 0.4, 0.6, 0.3, 0.3, 0.9],
+        [[3., 4., 6., 0., 0.1, 2.], [1., -1., 5., 3, 2., 1.1],
+         [-5., 0., 2., 0.1, 3., 1.], [0.2, 0.4, 0.6, 0.32, 0.3, 0.9],
          [0.2, 0.9, 0.65, 0.18, 0.3, 0.99], [0.8, 0.6, 0.5, 0.4, 0.9, 0.89]])
 
-    (query_ranks,
+    (highest_query_ranks, lowest_query_ranks, avg_query_ranks,
      query_similarities) = library_matching._find_query_rank_helper(
          similarities, library_keys, query_keys)
 
-    expected_query_ranks = [2, 3, 1, 3, 0, 4]
-    expected_query_similarities = [3., 1., 2., 0.3, 0.99, 0.5]
+    expected_highest_query_ranks = [4, 5, 1, 5, 1, 4]
+    expected_lowest_query_ranks = [2, 3, 1, 4, 0, 4]
+    expected_avg_query_ranks = [3, 4, 1, 4.5, 0.5, 4]
+    expected_query_similarities = [3., 1.1, 2., 0.3, 0.99, 0.5]
 
-    self.assertAllEqual(expected_query_ranks, query_ranks)
+    self.assertAllEqual(expected_highest_query_ranks, highest_query_ranks)
+    self.assertAllEqual(expected_lowest_query_ranks, lowest_query_ranks)
+    self.assertAllEqual(expected_avg_query_ranks, avg_query_ranks)
+
     self.assertAllEqual(expected_query_similarities, query_similarities)
+
+  def testInvertPermutation(self):
+    """Test library_matching._invert_permutation()."""
+
+    batch_size = 5
+    num_trials = 10
+    permutation_length = 6
+
+    def _validate_permutation(perm1, perm2):
+      ordered_indices = np.arange(perm1.shape[0])
+      self.assertAllEqual(perm1[perm2], ordered_indices)
+      self.assertAllEqual(perm2[perm1], ordered_indices)
+
+    for _ in range(num_trials):
+      perms = np.stack(
+          [
+              np.random.permutation(permutation_length)
+              for _ in range(batch_size)
+          ],
+          axis=0)
+
+      inverse = library_matching._invert_permutation(perms)
+
+      for j in range(batch_size):
+        _validate_permutation(perms[j], inverse[j])
 
   def np_normalize_rows(self, d):
     return d / np.maximum(
@@ -143,7 +172,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
 
     predictor_fn = lambda d: tf_transform(d[PREDICTOR_INPUT_KEY])
     similarity = similarity_lib.CosineSimilarityProvider()
-    true_data, predicted_data, _ = (
+    true_data, predicted_data, _, _ = (
         library_matching.library_matching(library_matching_data, predictor_fn,
                                           similarity, mass_tolerance, 10))
 
@@ -359,7 +388,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
     library_matching_data = library_matching.LibraryMatchingData(
         query=query_data, observed=observed_data, predicted=predicted_data)
 
-    _, predicted_data, _ = library_matching.library_matching(
+    _, predicted_data, _, _ = library_matching.library_matching(
         library_matching_data,
         predictor_fn=None,
         similarity_provider=similarity_lib.CosineSimilarityProvider(),
@@ -397,7 +426,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
 
     predictor_fn = lambda d: tf_transform(d[PREDICTOR_INPUT_KEY])
 
-    _, predicted_data, _ = library_matching.library_matching(
+    _, predicted_data, _, _ = library_matching.library_matching(
         library_matching_data,
         predictor_fn=predictor_fn,
         similarity_provider=similarity_lib.CosineSimilarityProvider(),
@@ -408,6 +437,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
       predictions = sess.run(predicted_data[fmap_constants.INCHIKEY])
 
     self.assertAllEqual(expected_predictions, predictions)
+
 
 if __name__ == '__main__':
   tf.test.main()
