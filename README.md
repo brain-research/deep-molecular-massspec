@@ -18,7 +18,9 @@ our model. This task is described in more detail below.
 
 ## Quickstart:
 
+```
 TARGET_PATH_NAME=/tmp/massspec_predictions
+```
 
 To convert an sdf file into a TFRecord: 
 
@@ -42,8 +44,8 @@ python molecule_estimator.py
 
 The aggregate training results will be logged to stdout. The final library
 matching results can also be found in
-$TARGET_PATH_NAME/models/output/predictions. These results report the query
-inchikey, the matched inchikey, and the rank asigned to the true spectra.
+`$TARGET_PATH_NAME/models/output/predictions`. Each line of this file includes the query
+inchikey, the matched inchikey, and the rank asigned to the true spectrum.
 
 It is also possible to view these results in tensorboard:
 
