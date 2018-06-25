@@ -21,6 +21,53 @@ import numpy as np
 import tensorflow as tf
 
 
+def _get_ckpt_from_path(path):
+  ckpt = tf.train.latest_checkpoint(path)
+  if ckpt is None:
+    raise ValueError('No checkpoint found in %s' % path)
+  tf.logging.info('Reading from checkpoint %s', ckpt)
+  return ckpt
+
+
+def run_graph_and_process_results(ops_to_fetch,
+                                  model_checkpoint_path,
+                                  process_fetched_values_fn,
+                                  feed_dict=None,
+                                  logging_frequency=10):
+  """Run a graph repeatedly and use the fetched values.
+
+  Args:
+    ops_to_fetch: a single Tensor or nested structure of Tensors. The graph will
+      be run, and the below callables will be called, until a
+      tf.errors.OutOfRangeError is caught. This is thrown when a tf.data.Dataset
+      runs out of data.
+    model_checkpoint_path: Path to model checkpoint. If a directory, the most
+      recent model checkpoint in this directory will be used.
+    process_fetched_values_fn: A callable, potentially with side-effects, that
+      takes as input the output of sess.run(ops_to_fetch).
+    feed_dict: a feed_dict to be included in sess.run calls.
+    logging_frequency: after this many batches have been processed, a logging
+    message will be printed.
+  """
+  ckpt = _get_ckpt_from_path(model_checkpoint_path)
+  saver = tf.train.Saver()
+
+  with tf.Session() as sess:
+    saver.restore(sess, ckpt)
+    counter = 0
+    while True:
+      try:
+        fetched_values = sess.run(ops_to_fetch, feed_dict=feed_dict)
+        process_fetched_values_fn(fetched_values)
+        counter += 1
+        if counter % logging_frequency == 0:
+          tf.logging.info('Total examples processed so far: %d', counter)
+      except tf.errors.OutOfRangeError:
+        tf.logging.info('Finished processing data. Processed %d batches',
+                        counter)
+        break
+
+
 def map_predictor(input_op, predictor_fn, sub_batch_size):
   """Wrapper for tf.map_fn to do batched computation within each map step."""
 

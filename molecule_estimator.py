@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 r"""Train and evaluate massspec model.
 
 Example usage:
 molecule_estimator.py --train_steps=1000 --model_dir='/tmp/models/output' \
-  --alsologtostderr
+--dataset_config_file=testdata/test_dataset_config_file.json --alsologtostderr
 """
 
 from __future__ import print_function
@@ -24,6 +23,7 @@ import json
 import os
 
 import dataset_setup_constants as ds_constants
+import feature_map_constants as fmap_constants
 import library_matching
 import molecule_predictors
 import parse_sdf_utils
@@ -33,7 +33,7 @@ FLAGS = tf.app.flags.FLAGS
 tf.flags.DEFINE_string(
     'dataset_config_file', None,
     'JSON file specifying the various filenames necessary for training and '
-    'evaluation. See _make_input_fn() for more details.')
+    'evaluation. See make_input_fn() for more details.')
 tf.flags.DEFINE_string(
     'hparams', '', 'Hyperparameter values to override the defaults.'
     'Format: params1=value1,params2=value2, ...'
@@ -58,8 +58,18 @@ tf.flags.DEFINE_enum('model_type', 'mlp',
 OUTPUT_HPARAMS_CONFIG_FILE_BASE = 'command_line_arguments.txt'
 
 
-def _make_input_fn(dataset_config_file, hparams, mode, features_to_load):
+def make_input_fn(dataset_config_file,
+                  hparams,
+                  mode,
+                  features_to_load,
+                  load_library_matching_data,
+                  data_dir=None):
   """Make input functions returning features and labels.
+
+  In our downstream code, it is advantageous to put both features
+  and labels together in the same nested structure. However, tf.estimator
+  requires input_fn() to return features and labels, so here our input_fn
+  returns dummy labels that will not be used.
 
   Args:
     dataset_config_file: filename of JSON file containing a dict mapping dataset
@@ -83,13 +93,18 @@ def _make_input_fn(dataset_config_file, hparams, mode, features_to_load):
               max_mass_spec_peak_loc, and batch_size
     mode: Set whether training or test mode
     features_to_load: list of keys to load from the input data
+    load_library_matching_data: whether to load library matching data.
+    data_dir: The directory containing the file names referred to in
+      dataset_config_file. If None (the default) then this is assumed to be the
+      directory containing dataset_config_file.
   Returns:
     A function for creating features and labels from a dataset.
   """
   with tf.gfile.Open(dataset_config_file, 'r') as f:
     filenames = json.load(f)
 
-  dataset_config_file_dir = os.path.split(dataset_config_file)[0]
+  if data_dir is None:
+    data_dir = os.path.dirname(dataset_config_file)
 
   def _input_fn(record_fnames,
                 all_data_in_one_batch,
@@ -97,10 +112,8 @@ def _make_input_fn(dataset_config_file, hparams, mode, features_to_load):
     """Reads TFRecord from a list of record file names."""
     if not record_fnames:
       return None
-    record_fnames = [
-        os.path.join(dataset_config_file_dir, r_name)
-        for r_name in record_fnames
-    ]
+
+    record_fnames = [os.path.join(data_dir, r_name) for r_name in record_fnames]
     dataset = parse_sdf_utils.get_dataset_from_record(
         record_fnames,
         hparams,
@@ -123,25 +136,13 @@ def _make_input_fn(dataset_config_file, hparams, mode, features_to_load):
 
   load_training_spectrum_library = hparams.loss == 'max_margin'
 
-  if mode == tf.estimator.ModeKeys.TRAIN:
-
-    def _wrapped_input_fn():
-      return {
-          'SPECTRUM_PREDICTION':
-              _input_fn(
-                  filenames[ds_constants.SPECTRUM_PREDICTION_TRAIN_KEY],
-                  all_data_in_one_batch=False,
-                  load_training_spectrum_library=load_training_spectrum_library)
-      }
-
-    return _wrapped_input_fn
-  else:
+  if load_library_matching_data:
 
     def _wrapped_input_fn():
       """Construct data for various eval tasks."""
 
       data_to_return = {
-          'SPECTRUM_PREDICTION':
+          fmap_constants.SPECTRUM_PREDICTION:
               _input_fn(
                   filenames[ds_constants.SPECTRUM_PREDICTION_TEST_KEY],
                   all_data_in_one_batch=False,
@@ -158,12 +159,24 @@ def _make_input_fn(dataset_config_file, hparams, mode, features_to_load):
         query = _input_fn(
             filenames[ds_constants.LIBRARY_MATCHING_QUERY_KEY],
             all_data_in_one_batch=False)
-        data_to_return[
-            'LIBRARY_MATCHING'] = library_matching.LibraryMatchingData(
-                observed=observed, predicted=predicted, query=query)
-      return data_to_return, tf.constant(0)
+        data_to_return[fmap_constants.
+                       LIBRARY_MATCHING] = library_matching.LibraryMatchingData(
+                           observed=observed, predicted=predicted, query=query)
 
-    return _wrapped_input_fn
+      return data_to_return, tf.constant(0)
+  else:
+
+    def _wrapped_input_fn():
+      # See the above comment about why we use dummy labels.
+      return {
+          fmap_constants.SPECTRUM_PREDICTION:
+              _input_fn(
+                  filenames[ds_constants.SPECTRUM_PREDICTION_TRAIN_KEY],
+                  all_data_in_one_batch=False,
+                  load_training_spectrum_library=load_training_spectrum_library)
+      }, tf.constant(0)
+
+  return _wrapped_input_fn
 
 
 def _log_command_line_string(model_type, model_dir, hparams):
@@ -185,14 +198,16 @@ def _log_command_line_string(model_type, model_dir, hparams):
     f.write(config_string)
 
 
-def _make_model_fn(prediction_helper, dataset_config_file, model_dir):
+def make_model_fn(prediction_helper, dataset_config_file, model_dir):
   """Returns a model function for estimator given prediction base class.
 
   Args:
     prediction_helper : Helper class containing prediction, loss, and evaluation
                         metrics
-    dataset_config_file: see _make_input_fn.
-    model_dir : directory for writing output files.
+    dataset_config_file: see make_input_fn.
+    model_dir : directory for writing output files. If model dir is not None,
+    a file containing all of the necessary command line flags to rehydrate
+    the model will be written in model_dir.
   Returns:
     A function that returns a tf.EstimatorSpec
   """
@@ -203,12 +218,13 @@ def _make_model_fn(prediction_helper, dataset_config_file, model_dir):
     # Input labels are ignored. All data are in features.
     del labels
 
-    _log_command_line_string(prediction_helper.model_type, model_dir, params)
+    if model_dir is not None:
+      _log_command_line_string(prediction_helper.model_type, model_dir, params)
 
     pred_op, pred_op_for_loss = prediction_helper.make_prediction_ops(
-        features['SPECTRUM_PREDICTION'], params, mode)
+        features[fmap_constants.SPECTRUM_PREDICTION], params, mode)
     loss_op = prediction_helper.make_loss(
-        pred_op_for_loss, features['SPECTRUM_PREDICTION'], params)
+        pred_op_for_loss, features[fmap_constants.SPECTRUM_PREDICTION], params)
 
     if mode == tf.estimator.ModeKeys.TRAIN:
       train_op = tf.contrib.layers.optimize_loss(
@@ -218,11 +234,16 @@ def _make_model_fn(prediction_helper, dataset_config_file, model_dir):
           learning_rate=params.learning_rate,
           optimizer='Adam')
       eval_op = None
-    else:
+    elif mode == tf.estimator.ModeKeys.PREDICT:
+      train_op = None
+      eval_op = None
+    elif mode == tf.estimator.ModeKeys.EVAL:
       train_op = None
       eval_op = prediction_helper.make_evaluation_metrics(
           features, params, dataset_config_file, output_dir=model_dir)
-
+    else:
+      raise ValueError('Invalid mode. Must be '
+                       'tf.estimator.ModeKeys.{TRAIN,PREDICT,EVAL}.')
     return tf.estimator.EstimatorSpec(
         mode=mode,
         predictions=pred_op,
@@ -242,13 +263,22 @@ def make_estimator_and_inputs(run_config,
                               warm_start_dir=None):
   """Make Estimator-compatible Estimator and input_fn for train and eval."""
 
-  model_fn = _make_model_fn(prediction_helper, dataset_config_file, model_dir)
-  train_input_fn = _make_input_fn(dataset_config_file, hparams,
-                                  tf.estimator.ModeKeys.TRAIN,
-                                  prediction_helper.features_to_load(hparams))
-  eval_input_fn = _make_input_fn(dataset_config_file, hparams,
-                                 tf.estimator.ModeKeys.EVAL,
-                                 prediction_helper.features_to_load(hparams))
+  model_fn = make_model_fn(prediction_helper, dataset_config_file, model_dir)
+
+  train_input_fn = make_input_fn(
+      dataset_config_file=dataset_config_file,
+      hparams=hparams,
+      mode=tf.estimator.ModeKeys.TRAIN,
+      features_to_load=prediction_helper.features_to_load(hparams),
+      load_library_matching_data=False)
+
+  eval_input_fn = make_input_fn(
+      dataset_config_file=dataset_config_file,
+      hparams=hparams,
+      mode=tf.estimator.ModeKeys.EVAL,
+      features_to_load=prediction_helper.features_to_load(hparams),
+      load_library_matching_data=True)
+
   estimator = tf.estimator.Estimator(
       model_fn=model_fn,
       params=hparams,

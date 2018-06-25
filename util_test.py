@@ -16,8 +16,11 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import tempfile
 
+from absl.testing import absltest
 from absl.testing import parameterized
+
 import util
 import numpy as np
 import tensorflow as tf
@@ -25,8 +28,65 @@ import tensorflow as tf
 
 class UtilTest(tf.test.TestCase, parameterized.TestCase):
 
+  def setUp(self):
+    self.temp_dir = tempfile.mkdtemp(dir=absltest.get_default_test_tmpdir())
+
+  def tearDown(self):
+    tf.gfile.DeleteRecursively(self.temp_dir)
+
+  def _make_model(self, batch_size, num_batches, variable_initializer_value):
+    np_inputs = np.arange(batch_size * num_batches)
+    np_inputs = np.float32(np_inputs)
+    inputs = tf.data.Dataset.from_tensor_slices(np_inputs)
+    inputs = inputs.batch(batch_size).make_one_shot_iterator().get_next()
+    scale = tf.get_variable(
+        name='scale', dtype=tf.float32, initializer=variable_initializer_value,
+        trainable=True)
+    output = inputs * scale
+    return output
+
+  def test_run_graph_and_process_results(self):
+
+    batch_size = 3
+    num_batches = 5
+
+    # Make a graph that contains a Variable and save it to checkpoint.
+    with tf.Graph().as_default():
+      _ = self._make_model(
+          batch_size=batch_size, num_batches=num_batches,
+          variable_initializer_value=2.0)
+      saver = tf.train.Saver(tf.trainable_variables())
+      with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+        saver.save(sess, self.temp_dir + '/model-')
+
+    # Make another copy of the graph, and process data using this one.
+    with tf.Graph().as_default():
+      # We intentionally make this graph have a different value for its Variable
+      # than the graph above. When we restore from checkpoint, we will grab the
+      # value from the first graph. This helps test that the Variables are
+      # being properly restored from checkpoint.
+      ops_to_fetch = self._make_model(
+          batch_size=batch_size, num_batches=num_batches,
+          variable_initializer_value=3.0
+      )
+
+      results = []
+      def process_fetched_values_fn(np_array):
+        results.append(np_array)
+
+      model_checkpoint_path = self.temp_dir
+
+      util.run_graph_and_process_results(ops_to_fetch, model_checkpoint_path,
+                                         process_fetched_values_fn)
+
+      results = np.concatenate(results, axis=0)
+      expected_results = np.arange(num_batches * batch_size) * 2.0
+
+      self.assertAllEqual(results, expected_results)
+
   @parameterized.parameters(('7'), ('10'), ('65'))
-  def testMapPredictor(self, sub_batch_size):
+  def test_map_predictor(self, sub_batch_size):
     input_op = {
         'a': tf.random_normal(shape=(50, 5)),
         'b': tf.random_normal(shape=(50, 5))
@@ -46,7 +106,7 @@ class UtilTest(tf.test.TestCase, parameterized.TestCase):
           'The output of _map_predictor does not match a direct '
           'application of predictor_fn.')
 
-  def testValueOpWithInitializer(self):
+  def test_value_op_with_initializer(self):
     """Test correctness of library_matching.value_op_with_initializer."""
 
     base_value_op = tf.get_variable('value', initializer=0.)
@@ -117,3 +177,6 @@ class UtilTest(tf.test.TestCase, parameterized.TestCase):
     index_shift = 1
     expected_output = [[2, 1, 0, 0], [7, 6, 5, 0], [12, 11, 10, 9]]
     _validate(anchor_indices, data, index_shift, expected_output)
+
+if __name__ == '__main__':
+  tf.test.main()

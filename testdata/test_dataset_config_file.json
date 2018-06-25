@@ -1,0 +1,1 @@
+{"LIBRARY_MATCHING_PREDICTED": ["test_14_record.gz"], "SPECTRUM_PREDICTION_TEST": ["test_14_record.gz"], "mainlib_train_spectra_library_file": "test_14.spectra_library.npy", "SPECTRUM_PREDICTION_TRAIN": ["test_14_record.gz"], "LIBRARY_MATCHING_QUERY": ["test_14_record.gz"], "LIBRARY_MATCHING_OBSERVED": ["test_14_record.gz"]}

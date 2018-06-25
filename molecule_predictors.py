@@ -299,7 +299,7 @@ class MassSpectraPrediction(object):
             if hparams.filter_library_matches_by_mass else None)
         (metrics, library_match_spectra,
          library_match_inchikeys) = library_matching.library_match_accuracy(
-             feature_dict['LIBRARY_MATCHING'],
+             feature_dict[fmap_constants.LIBRARY_MATCHING],
              make_prediction,
              hparams.eval_batch_size,
              similarity_provider=similarity_lib.
@@ -310,7 +310,7 @@ class MassSpectraPrediction(object):
       metrics = {}
 
     if hparams.make_spectra_plots:
-      data_for_spectra_plots = feature_dict['SPECTRUM_PREDICTION']
+      data_for_spectra_plots = feature_dict[fmap_constants.SPECTRUM_PREDICTION]
       pred_val = self._make_prediction(
           data_for_spectra_plots,
           hparams,

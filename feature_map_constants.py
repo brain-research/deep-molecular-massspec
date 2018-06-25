@@ -14,6 +14,10 @@
 
 """Module containing the feature names used in the TFRecords of this repo."""
 
+# Overall Tasks
+LIBRARY_MATCHING = 'library_matching'
+SPECTRUM_PREDICTION = 'spectrum_prediction'
+
 # Feature names
 ATOM_WEIGHTS = 'atom_weights'
 MOLECULE_WEIGHT = 'molecule_weight'
