@@ -20,7 +20,7 @@ our model. This task is described in more detail below.
 
 TARGET_PATH_NAME=/tmp/massspec_predictions
 
-To convert an sdf file into a TFRecord: \
+To convert an sdf file into a TFRecord: 
 
 ```
 python make_train_test_split.py \
@@ -34,7 +34,7 @@ To train a model:
 
 ```
 python molecule_estimator.py
---dataset_config_file=~/spectra_tf_records/query_replicates_val_predicted_replicates_val.json
+--dataset_config_file=~/spectra_tf_records/query_replicates_val_predicted_replicates_val.json \
 --train_steps=1000 \
 --model_dir=$TARGET_PATH_NAME/models/output --hparams=make_spectra_plots=True \
 --alsologtostderr
