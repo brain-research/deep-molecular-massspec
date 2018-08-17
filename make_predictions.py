@@ -48,6 +48,7 @@ import util
 
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -156,12 +157,15 @@ def main(_):
             key = key[0]
             results[key] = prediction
             spectra_plot_file_name = plot_spectra_utils.name_plot_file(
-                plot_spectra_utils.PlotModeKeys.PREDICTED_SPECTRUM, key)
+                plot_spectra_utils.PlotModeKeys.PREDICTED_SPECTRUM, key, file_type='png')
             # Rescale the true/predicted spectra
-            true_spectrum = true_spectrum * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
-            prediction = prediction * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
+            true_spectrum = true_spectrum / true_spectrum.max() * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
+            prediction = prediction / prediction.max() * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
             plot_spectra_utils.plot_true_and_predicted_spectra(
-                true_spectrum, prediction, output_filename=os.path.join(results_dir, spectra_plot_file_name))
+                true_spectrum, prediction,
+                output_filename=os.path.join(results_dir,spectra_plot_file_name),
+                rescale_mz_axis=True
+            )
 
   util.run_graph_and_process_results(ops_to_fetch, FLAGS.model_checkpoint_path,
                                      process_fetched_values_fn)
