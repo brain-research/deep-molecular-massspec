@@ -125,7 +125,7 @@ def _make_features_labels_and_estimator(model_type, hparam_string, input_file):
   return features, labels, estimator_spec
 
 
-def _save_plot_figure(key, prediction, true_spectrum, results_dir)
+def _save_plot_figure(key, prediction, true_spectrum, results_dir):
   """A helper function that makes and saves plots of true and predicted spectra."""
   spectra_plot_file_name = plot_spectra_utils.name_plot_file(
       plot_spectra_utils.PlotModeKeys.PREDICTED_SPECTRUM, key, file_type='png')
