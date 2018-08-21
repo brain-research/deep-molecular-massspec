@@ -43,10 +43,12 @@ import feature_map_constants as fmap_constants
 import molecule_estimator
 
 import molecule_predictors
+import plot_spectra_utils
 import util
 
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -58,7 +60,10 @@ tf.flags.DEFINE_string(
     'Path to model checkpoint. If a directory, the most '
     'recent model checkpoint in this directory will be used. If a file, it '
     'should be of the form /.../name-of-the-file.ckpt-10000')
-
+tf.flags.DEFINE_bool(
+    'save_spectra_plots', True,
+    'Make plots of true and predicted spectra for each query molecule.'
+)
 tf.flags.DEFINE_string('output_file', None,
                        'Location where outputs will be written.')
 
@@ -120,6 +125,22 @@ def _make_features_labels_and_estimator(model_type, hparam_string, input_file):
   return features, labels, estimator_spec
 
 
+def _save_plot_figure(key, prediction, true_spectrum, results_dir):
+  """A helper function that makes and saves plots of true and predicted spectra."""
+  spectra_plot_file_name = plot_spectra_utils.name_plot_file(
+      plot_spectra_utils.PlotModeKeys.PREDICTED_SPECTRUM, key, file_type='png')
+  
+  # Rescale the true/predicted spectra
+  true_spectrum = true_spectrum / true_spectrum.max() * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
+  prediction = prediction / prediction.max() * plot_spectra_utils.MAX_VALUE_OF_TRUE_SPECTRA
+  
+  plot_spectra_utils.plot_true_and_predicted_spectra(
+      true_spectrum, prediction,
+      output_filename=os.path.join(results_dir,spectra_plot_file_name),
+      rescale_mz_axis=True
+  )
+
+
 def main(_):
 
   features, labels, estimator_spec = _make_features_labels_and_estimator(
@@ -130,20 +151,32 @@ def main(_):
   inchikey_op = features[fmap_constants.SPECTRUM_PREDICTION][
       fmap_constants.INCHIKEY]
   ops_to_fetch = [inchikey_op, pred_op]
+  if FLAGS.save_spectra_plots:
+      true_spectra_op = features[fmap_constants.SPECTRUM_PREDICTION][fmap_constants.DENSE_MASS_SPEC]
+      ops_to_fetch.append(true_spectra_op)
 
   results = {}
+  results_dir = os.path.dirname(FLAGS.output_file)
+  tf.gfile.MakeDirs(results_dir)
 
   def process_fetched_values_fn(fetched_values):
-    keys, predictions = fetched_values
-    for key, prediction in zip(keys, predictions):
-      # Dereference the singleton np string array to get the actual string.
-      key = key[0]
-      results[key] = prediction
+    if FLAGS.save_spectra_plots:
+        keys, predictions, true_spectra = fetched_values
+        for key, prediction, true_spectrum in zip(keys, predictions, true_spectra):
+            # Dereference the singleton np string array to get the actual string.
+            key = key[0]
+            results[key] = prediction
+            _save_plot_figure(key, prediction, true_spectrum, results_dir)
+    else:
+        keys, predictions = fetched_values
+        for key, prediction in zip(keys, predictions):
+            # Dereference the singleton np string array to get the actual string.
+            key = key[0]
+            results[key] = prediction            
 
   util.run_graph_and_process_results(ops_to_fetch, FLAGS.model_checkpoint_path,
                                      process_fetched_values_fn)
 
-  tf.gfile.MakeDirs(os.path.dirname(FLAGS.output_file))
   np.save(FLAGS.output_file, results)
 
 

@@ -18,7 +18,6 @@ from __future__ import print_function
 import json
 import os
 
-
 import dataset_setup_constants as ds_constants
 import mass_spec_constants as ms_constants
 import matplotlib.pyplot as plt
@@ -34,9 +33,10 @@ SPECTRA_PLOT_GRID_COLOR = 'black'
 SPECTRA_PLOT_TRUE_SPECTRA_COLOR = 'blue'
 SPECTRA_PLOT_PREDICTED_SPECTRA_COLOR = 'red'
 SPECTRA_PLOT_PEAK_LOC_LIMIT = ms_constants.MAX_PEAK_LOC
+SPECTRA_PLOT_MZ_MAX_OFFSET = 10
 SPECTRA_PLOT_INTENSITY_LIMIT = 1200
 SPECTRA_PLOT_DPI = 300
-SPECTRA_PLOT_BAR_LINE_WIDTH = 1.0
+SPECTRA_PLOT_BAR_LINE_WIDTH = 0.8
 SPECTRA_PLOT_BAR_GRID_LINE_WIDTH = 0.1
 SPECTRA_PLOT_ACTUAL_SPECTRA_LEGEND_TEXT = 'True Mass Spectrum'
 SPECTRA_PLOT_PREDICTED_SPECTRA_LEGEND_TEXT = 'Predicted Mass Spectrum'
@@ -64,11 +64,11 @@ class PlotModeKeys(object):
   LIBRARY_MATCHED_SPECTRUM = 'library_match_spectrum'
 
 
-def name_plot_file(mode, query_inchikey, matched_inchikey=None):
+def name_plot_file(mode, query_inchikey, matched_inchikey=None, file_type='png'):
   if mode == PlotModeKeys.PREDICTED_SPECTRUM:
-    return '{}.png'.format(query_inchikey)
+    return '{}.{}'.format(query_inchikey, file_type)
   elif mode == PlotModeKeys.LIBRARY_MATCHED_SPECTRUM:
-    return '{}_matched_to_{}.png'.format(query_inchikey, matched_inchikey)
+    return '{}_matched_to_{}.{}'.format(query_inchikey, matched_inchikey, file_type)
 
 
 def name_metric(mode, inchikey):
@@ -79,8 +79,12 @@ def plot_true_and_predicted_spectra(
     true_dense_spectra,
     generated_dense_spectra,
     plot_mode_key=PlotModeKeys.PREDICTED_SPECTRUM,
-    output_filename=''):
+    output_filename='',
+    rescale_mz_axis=False):
   """Generates a plot comparing a true and predicted mass spec spectra.
+
+  If output_filename given, saves a png file of the spectra, with the
+  true spectrum above and predicted spectrum below.
 
   Args:
     true_dense_spectra : np.array representing the true mass spectra
@@ -91,7 +95,21 @@ def plot_true_and_predicted_spectra(
     np.array of the bits of the generated matplotlib plot.
   """
 
-  x_array = np.arange(SPECTRA_PLOT_PEAK_LOC_LIMIT)
+  if not rescale_mz_axis:
+    x_array = np.arange(SPECTRA_PLOT_PEAK_LOC_LIMIT)
+    bar_width = SPECTRA_PLOT_BAR_LINE_WIDTH
+  else:
+    mz_max = max(max(np.nonzero(true_dense_spectra)[0]),
+                 max(np.nonzero(generated_dense_spectra)[0]))
+    if mz_max + SPECTRA_PLOT_MZ_MAX_OFFSET < ms_constants.MAX_PEAK_LOC:
+      mz_max += SPECTRA_PLOT_MZ_MAX_OFFSET
+    else:
+        mz_max = ms_constants.MAX_PEAK_LOC
+    x_array = np.arange(mz_max)
+    true_dense_spectra = true_dense_spectra[:mz_max]
+    generated_dense_spectra = generated_dense_spectra[:mz_max]
+    bar_width = SPECTRA_PLOT_BAR_LINE_WIDTH * mz_max / ms_constants.MAX_PEAK_LOC
+
   figure = plt.figure(figsize=SPECTRA_PLOT_FIGURE_SIZE, dpi=300)
 
   # Adding extra subplot so both plots have common x-axis and y-axis labels
@@ -107,9 +125,10 @@ def plot_true_and_predicted_spectra(
   bar_top = ax_top.bar(
       x_array,
       true_dense_spectra,
+      bar_width,
       color=SPECTRA_PLOT_TRUE_SPECTRA_COLOR,
       edgecolor=SPECTRA_PLOT_TRUE_SPECTRA_COLOR,
-      linewidth=SPECTRA_PLOT_BAR_LINE_WIDTH)
+  )
 
   ax_top.set_ylim((0, SPECTRA_PLOT_INTENSITY_LIMIT))
   plt.setp(ax_top.get_xticklabels(), visible=False)
@@ -122,13 +141,15 @@ def plot_true_and_predicted_spectra(
   bar_bottom = ax_bottom.bar(
       x_array,
       generated_dense_spectra,
+      bar_width,
       color=SPECTRA_PLOT_PREDICTED_SPECTRA_COLOR,
       edgecolor=SPECTRA_PLOT_PREDICTED_SPECTRA_COLOR,
-      linewidth=SPECTRA_PLOT_BAR_LINE_WIDTH)
+  )
 
   # Invert the direction of y-axis ticks for bottom graph.
   ax_bottom.set_ylim((SPECTRA_PLOT_INTENSITY_LIMIT, 0))
 
+  ax_bottom.set_xlim(0, mz_max)
   # Remove overlapping 0's from middle of y-axis
   yticks_bottom = ax_bottom.yaxis.get_major_ticks()
   yticks_bottom[0].label1.set_visible(False)
@@ -170,12 +191,12 @@ def plot_true_and_predicted_spectra(
     # communicate with the filesystem through gfile. In some scenarios, this
     # will prevent us from writing out data. Instead, we use PIL to help us
     # efficiently save the nparray of the image as a png file.
-    if not output_filename.endswith('.png'):
+    if not output_filename.endswith('.png') or output_filename.endswith('.eps'):
       output_filename += '.png'
 
     with tf.gfile.GFile(output_filename, 'wb') as out:
       image = PilImage.fromarray(data).convert('RGB')
-      image.save(out)
+      image.save(out, dpi=(SPECTRA_PLOT_DPI, SPECTRA_PLOT_DPI))
 
   tf.logging.info('Shape of spectra plot data {} '.format(np.shape(data)))
 
