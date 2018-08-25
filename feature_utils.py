@@ -49,6 +49,11 @@ def get_smiles_string(mol):
   return Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
 
 
+def get_molecular_formula(mol):
+    """Make String of molecular formula from rdkit.Mol"""
+    return AllChem.CalcMolFormula(mol)
+
+
 def parse_peaks(pk_str):
   r"""Helper function for converting peak string into vector form.
 
