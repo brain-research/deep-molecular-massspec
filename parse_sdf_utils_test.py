@@ -47,6 +47,7 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
     self.expected_mol_dicts = [{
         fmap_constants.NAME: 'Methane, diazo-',
         fmap_constants.INCHIKEY: 'YXHKONLOYHBTNS-UHFFFAOYSA-N',
+        fmap_constants.MOLECULAR_FORMULA: 'CH2N2',
         fmap_constants.SMILES: 'C=[N+]=[N-]',
         'parsed_smiles': [28, 18, 81, 51, 4, 83, 18, 81, 51, 5, 83],
         fmap_constants.SMILES_TOKEN_LIST_LENGTH: 11
@@ -56,6 +57,8 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
             ' dimethyl ester'),
         fmap_constants.INCHIKEY:
             'PNYUDNYAXSEACV-RVDMUPIBSA-N',
+        fmap_constants.MOLECULAR_FORMULA:
+            'C20H21ClN2O5',
         fmap_constants.SMILES:
             'COC(=O)/C=C(/C(=O)OC)c1[nH]cc(-c2ccc(Cl)cc2)c1N1CCOCC1',
         'parsed_smiles': [
@@ -358,7 +361,7 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
     for i in range(len(self.expected_mol_dicts)):
       mol_dict_key_names = [
           fmap_constants.NAME, fmap_constants.INCHIKEY,
-          fmap_constants.SMILES
+          fmap_constants.SMILES, fmap_constants.MOLECULAR_FORMULA,
       ]
       for kwarg in mol_dict_key_names:
         self.assertEqual(self.expected_mol_dicts[i][kwarg], mol_dicts[i][kwarg])
@@ -405,6 +408,7 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
         fmap_constants.MOLECULE_WEIGHT,
         fmap_constants.DENSE_MASS_SPEC,
         fmap_constants.INCHIKEY, fmap_constants.NAME,
+        fmap_constants.MOLECULAR_FORMULA,
         fmap_constants.ADJACENCY_MATRIX,
         fmap_constants.ATOM_IDS, fmap_constants.SMILES
     ]
@@ -439,6 +443,9 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
       self.assertEqual(
           feature_values[fmap_constants.INCHIKEY][i],
           self.expected_mol_dicts[i][fmap_constants.INCHIKEY])
+      self.assertEqual(
+          feature_values[fmap_constants.MOLECULAR_FORMULA][i],
+          self.expected_mol_dicts[i][fmap_constants.MOLECULAR_FORMULA])
       self.assertSequenceAlmostEqual(
           feature_values[fmap_constants.DENSE_MASS_SPEC][i],
           self.expected_mol_dicts[i][fmap_constants.DENSE_MASS_SPEC],
@@ -516,6 +523,7 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
         fmap_constants.MOLECULE_WEIGHT,
         fmap_constants.DENSE_MASS_SPEC,
         fmap_constants.INCHIKEY, fmap_constants.NAME,
+        fmap_constants.MOLECULAR_FORMULA,
         fmap_constants.ADJACENCY_MATRIX,
         fmap_constants.ATOM_IDS, fmap_constants.SMILES
     ]
@@ -553,6 +561,8 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
                        mol_dicts[i][fmap_constants.NAME])
       self.assertEqual(feature_values[fmap_constants.INCHIKEY][i],
                        mol_dicts[i][fmap_constants.INCHIKEY])
+      self.assertEqual(feature_values[fmap_constants.MOLECULAR_FORMULA][i],
+                       mol_dicts[i][fmap_constants.MOLECULAR_FORMULA])
       self.assertSequenceAlmostEqual(
           feature_values[fmap_constants.DENSE_MASS_SPEC][i],
           mol_dicts[i][fmap_constants.DENSE_MASS_SPEC],

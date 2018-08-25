@@ -239,6 +239,7 @@ def make_mol_dict(mol,
   """
   # For canonicalizing molecules
   smiles_canon = feature_utils.get_smiles_string(mol)
+  mol_formula = feature_utils.get_molecular_formula(mol)
   mol_canon = Chem.MolFromSmiles(smiles_canon)
   if add_hs_to_molecule:
     mol_canon = Chem.AddHs(mol_canon)
@@ -258,6 +259,7 @@ def make_mol_dict(mol,
           mol.GetProp(ms_constants.SDF_TAG_NAME),
       fmap_constants.INCHIKEY:
           mol.GetProp(ms_constants.SDF_TAG_INCHIKEY),
+      fmap_constants.MOLECULAR_FORMULA: mol_formula,
       fmap_constants.MOLECULE_WEIGHT:
           float(mol.GetProp(ms_constants.SDF_TAG_MOLECULE_MASS)),
       fmap_constants.SMILES:
@@ -301,6 +303,8 @@ def dict_to_tfexample(mol_dict):
       mol_dict[fmap_constants.DENSE_MASS_SPEC])
   feature_map[fmap_constants.INCHIKEY].bytes_list.value.append(
       mol_dict[fmap_constants.INCHIKEY])
+  feature_map[fmap_constants.MOLECULAR_FORMULA].bytes_list.value.append(
+      mol_dict[fmap_constants.MOLECULAR_FORMULA])
   feature_map[fmap_constants.NAME].bytes_list.value.append(
       mol_dict[fmap_constants.NAME])
   feature_map[fmap_constants.SMILES].bytes_list.value.append(
@@ -455,6 +459,8 @@ def _parse_example(example_protos, hparams, features_to_load):
       fmap_constants.DENSE_MASS_SPEC:
           tf.FixedLenFeature([hparams.max_mass_spec_peak_loc], tf.float32),
       fmap_constants.INCHIKEY:
+          tf.FixedLenFeature([1], tf.string, default_value=''),
+      fmap_constants.MOLECULAR_FORMULA:
           tf.FixedLenFeature([1], tf.string, default_value=''),
       fmap_constants.NAME:
           tf.FixedLenFeature([1], tf.string, default_value=''),
