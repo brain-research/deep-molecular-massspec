@@ -115,6 +115,9 @@ def get_sdf_to_mol(
 
   def _mol_passes_filters(mol):
     """A helper function for testing mols on all filtering conditions."""
+    if feature_utils.check_mol_has_non_empty_smiles(mol):
+        return False
+
     filter_list = []
     filter_list.append(feature_utils.check_mol_has_non_empty_smiles(mol))
 
@@ -550,8 +553,8 @@ def get_dataset_from_record(fnames,
     ValueError: if <fname>.info does not exist for any files in fnames.
   """
   if mode == tf.estimator.ModeKeys.TRAIN and len(fnames) > 1:
-    raise ValueError('Loading multiple files are not supported by this function'
-                     ' for training mode.')
+    tf.logging.warn('Interleaving not handled for multiple training sets.')    
+
   if not fnames:
     raise ValueError('Input list of filenames is empty.')
 

@@ -98,6 +98,7 @@ def plot_true_and_predicted_spectra(
   if not rescale_mz_axis:
     x_array = np.arange(SPECTRA_PLOT_PEAK_LOC_LIMIT)
     bar_width = SPECTRA_PLOT_BAR_LINE_WIDTH
+    mz_max = SPECTRA_PLOT_PEAK_LOC_LIMIT 
   else:
     mz_max = max(max(np.nonzero(true_dense_spectra)[0]),
                  max(np.nonzero(generated_dense_spectra)[0]))
