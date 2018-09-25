@@ -33,6 +33,8 @@ import numpy as np
 from rdkit import Chem
 import tensorflow as tf
 
+# TODO: Implement better shuffling across input files so we don't require a large shuffle
+#       buffer.
 SHUFFLE_BUFFER_SIZE = 200000
 
 
