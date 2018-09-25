@@ -33,7 +33,7 @@ import numpy as np
 from rdkit import Chem
 import tensorflow as tf
 
-SHUFFLE_BUFFER_SIZE = 300000
+SHUFFLE_BUFFER_SIZE = 200000
 
 
 def find_inchikey_duplicates(mol_list):
@@ -556,7 +556,7 @@ def get_dataset_from_record(fnames,
   """
   if mode == tf.estimator.ModeKeys.TRAIN and len(fnames) > 1:
     tf.logging.warn('Please ensure that shuffle buffer is large enough to effectively'
-                    'shuffle across all dataset input files.')
+                    ' shuffle across all dataset input files.')
 
   if not fnames:
     raise ValueError('Input list of filenames is empty.')
