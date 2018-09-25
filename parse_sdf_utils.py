@@ -115,7 +115,7 @@ def get_sdf_to_mol(
 
   def _mol_passes_filters(mol):
     """A helper function for testing mols on all filtering conditions."""
-    if feature_utils.check_mol_has_non_empty_smiles(mol):
+    if not feature_utils.check_mol_has_non_empty_mass_spec_peak_tag(mol):
         return False
 
     filter_list = []
