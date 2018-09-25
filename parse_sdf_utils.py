@@ -553,7 +553,8 @@ def get_dataset_from_record(fnames,
     ValueError: if <fname>.info does not exist for any files in fnames.
   """
   if mode == tf.estimator.ModeKeys.TRAIN and len(fnames) > 1:
-    tf.logging.warn('Interleaving not handled for multiple training sets.')    
+    tf.logging.warn('Please ensure that shuffle buffer is large enough to effectively'
+                    'shuffle across all dataset input files.')
 
   if not fnames:
     raise ValueError('Input list of filenames is empty.')
@@ -564,7 +565,7 @@ def get_dataset_from_record(fnames,
       [parse_info_file(fname)['num_examples'] for fname in fnames])
 
   if mode == tf.estimator.ModeKeys.TRAIN and not all_data_in_one_batch:
-    dataset = dataset.shuffle(50000)
+    dataset = dataset.shuffle(300000)
 
   # It is important to parse before we batch. Otherwise, the batched data
   # will have all of the fields in the input data, not just those in
