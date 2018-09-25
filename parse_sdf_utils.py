@@ -33,6 +33,8 @@ import numpy as np
 from rdkit import Chem
 import tensorflow as tf
 
+SHUFFLE_BUFFER_SIZE = 300000
+
 
 def find_inchikey_duplicates(mol_list):
   """Analyze a list of rdkit.Mol and identify InChIKey with more than molecule.
@@ -565,7 +567,7 @@ def get_dataset_from_record(fnames,
       [parse_info_file(fname)['num_examples'] for fname in fnames])
 
   if mode == tf.estimator.ModeKeys.TRAIN and not all_data_in_one_batch:
-    dataset = dataset.shuffle(300000)
+    dataset = dataset.shuffle(SHUFFLE_BUFFER_SIZE)
 
   # It is important to parse before we batch. Otherwise, the batched data
   # will have all of the fields in the input data, not just those in
