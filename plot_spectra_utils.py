@@ -33,7 +33,7 @@ SPECTRA_PLOT_GRID_COLOR = 'black'
 SPECTRA_PLOT_TRUE_SPECTRA_COLOR = 'blue'
 SPECTRA_PLOT_PREDICTED_SPECTRA_COLOR = 'red'
 SPECTRA_PLOT_PEAK_LOC_LIMIT = ms_constants.MAX_PEAK_LOC
-SPECTRA_PLOT_MZ_MAX_OFFSET = 10
+SPECTRA_PLOT_MZ_MAX_OFFSET = 10 
 SPECTRA_PLOT_INTENSITY_LIMIT = 1200
 SPECTRA_PLOT_DPI = 300
 SPECTRA_PLOT_BAR_LINE_WIDTH = 0.8
@@ -42,6 +42,8 @@ SPECTRA_PLOT_ACTUAL_SPECTRA_LEGEND_TEXT = 'True Mass Spectrum'
 SPECTRA_PLOT_PREDICTED_SPECTRA_LEGEND_TEXT = 'Predicted Mass Spectrum'
 SPECTRA_PLOT_QUERY_SPECTRA_LEGEND_TEXT = 'Query Mass Spectrum'
 SPECTRA_PLOT_LIBRARY_MATCH_SPECTRA_LEGEND_TEXT = 'Library Matched Mass Spectrum'
+SPECTRA_PLOT_MAINLIB_SPECTRA_LEGEND_TEXT = 'Mainlib Spectrum'
+SPECTRA_PLOT_REPLICATES_SPECTRA_LEGEND_TEXT = 'Replicates Spectrum'
 SPECTRA_PLOT_X_AXIS_LABEL = 'mass/charge ratio'
 SPECTRA_PLOT_Y_AXIS_LABEL = 'relative intensity'
 SPECTRA_PLOT_PLACE_LEGEND_ABOVE_CHART_KWARGS = {'ncol': 2}
@@ -59,9 +61,11 @@ class PlotModeKeys(object):
       against the true spectrum.
   LIBRARY_MATCHED_SPECTRUM : For plotting the spectrum that was the closest
       match to the true spectrum against the true spectrum.
+  MAINLIB_REPLICATES_SPECTRUM : mainlib replicates spectra predictions. 
   """
   PREDICTED_SPECTRUM = 'predicted_spectrum'
   LIBRARY_MATCHED_SPECTRUM = 'library_match_spectrum'
+  MAINLIB_REPLICATES_SPECTRUM = 'mainlib_replicates_spectrum'
 
 
 def name_plot_file(mode, query_inchikey, matched_inchikey=None, file_type='png'):
@@ -69,6 +73,8 @@ def name_plot_file(mode, query_inchikey, matched_inchikey=None, file_type='png')
     return '{}.{}'.format(query_inchikey, file_type)
   elif mode == PlotModeKeys.LIBRARY_MATCHED_SPECTRUM:
     return '{}_matched_to_{}.{}'.format(query_inchikey, matched_inchikey, file_type)
+  elif mode == PlotModeKeys.MAINLIB_REPLICATES_SPECTRUM:
+    return '{}_mainlib_replciates.{}'.format(query_inchikey, file_type)
 
 
 def name_metric(mode, inchikey):
@@ -131,6 +137,7 @@ def plot_true_and_predicted_spectra(
       edgecolor=SPECTRA_PLOT_TRUE_SPECTRA_COLOR,
   )
 
+  ax_top.set_xlim((0, mz_max))
   ax_top.set_ylim((0, SPECTRA_PLOT_INTENSITY_LIMIT))
   plt.setp(ax_top.get_xticklabels(), visible=False)
   ax_top.grid(
@@ -147,10 +154,10 @@ def plot_true_and_predicted_spectra(
       edgecolor=SPECTRA_PLOT_PREDICTED_SPECTRA_COLOR,
   )
 
+  ax_bottom.set_xlim(0, mz_max)
   # Invert the direction of y-axis ticks for bottom graph.
   ax_bottom.set_ylim((SPECTRA_PLOT_INTENSITY_LIMIT, 0))
 
-  ax_bottom.set_xlim(0, mz_max)
   # Remove overlapping 0's from middle of y-axis
   yticks_bottom = ax_bottom.yaxis.get_major_ticks()
   yticks_bottom[0].label1.set_visible(False)
@@ -174,6 +181,11 @@ def plot_true_and_predicted_spectra(
     ax_top.legend((bar_top, bar_bottom),
                   (SPECTRA_PLOT_QUERY_SPECTRA_LEGEND_TEXT,
                    SPECTRA_PLOT_LIBRARY_MATCH_SPECTRA_LEGEND_TEXT),
+                  **SPECTRA_PLOT_PLACE_LEGEND_ABOVE_CHART_KWARGS)
+  elif plot_mode_key == PlotModeKeys.MAINLIB_REPLICATES_SPECTRUM:
+    ax_top.legend((bar_top, bar_bottom),
+                  (SPECTRA_PLOT_MAINLIB_SPECTRA_LEGEND_TEXT ,
+                   SPECTRA_PLOT_REPLICATES_SPECTRA_LEGEND_TEXT), 
                   **SPECTRA_PLOT_PLACE_LEGEND_ABOVE_CHART_KWARGS)
 
   figure.canvas.draw()
