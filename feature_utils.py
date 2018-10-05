@@ -244,6 +244,11 @@ def check_mol_has_non_empty_smiles(mol):
   return bool(get_smiles_string(mol))
 
 
+def check_mol_has_non_empty_mass_spec_peak_tag(mol):
+  """Checks if mass spec sdf tag is in properties of rdkit.Mol."""
+  return ms_constants.SDF_TAG_MASS_SPEC_PEAKS in mol.GetPropsAsDict().keys()
+
+
 def check_mol_only_has_atoms(mol, accept_atom_list):
   """Checks if rdkit.Mol only contains atoms from accept_atom_list."""
   atom_symbol_list = [atom.GetSymbol() for atom in mol.GetAtoms()]

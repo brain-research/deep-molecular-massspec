@@ -33,6 +33,10 @@ import numpy as np
 from rdkit import Chem
 import tensorflow as tf
 
+# TODO: Implement better shuffling across input files so we don't require a large shuffle
+#       buffer.
+SHUFFLE_BUFFER_SIZE = 200000
+
 
 def find_inchikey_duplicates(mol_list):
   """Analyze a list of rdkit.Mol and identify InChIKey with more than molecule.
@@ -115,6 +119,9 @@ def get_sdf_to_mol(
 
   def _mol_passes_filters(mol):
     """A helper function for testing mols on all filtering conditions."""
+    if not feature_utils.check_mol_has_non_empty_mass_spec_peak_tag(mol):
+        return False
+
     filter_list = []
     filter_list.append(feature_utils.check_mol_has_non_empty_smiles(mol))
 
@@ -556,8 +563,9 @@ def get_dataset_from_record(fnames,
     ValueError: if <fname>.info does not exist for any files in fnames.
   """
   if mode == tf.estimator.ModeKeys.TRAIN and len(fnames) > 1:
-    raise ValueError('Loading multiple files are not supported by this function'
-                     ' for training mode.')
+    tf.logging.warn('Please ensure that shuffle buffer is large enough to effectively'
+                    ' shuffle across all dataset input files.')
+
   if not fnames:
     raise ValueError('Input list of filenames is empty.')
 
@@ -567,7 +575,7 @@ def get_dataset_from_record(fnames,
       [parse_info_file(fname)['num_examples'] for fname in fnames])
 
   if mode == tf.estimator.ModeKeys.TRAIN and not all_data_in_one_batch:
-    dataset = dataset.shuffle(50000)
+    dataset = dataset.shuffle(SHUFFLE_BUFFER_SIZE)
 
   # It is important to parse before we batch. Otherwise, the batched data
   # will have all of the fields in the input data, not just those in
