@@ -6,7 +6,6 @@ import parse_sdf_utils
 import train_test_split_utils
 import feature_utils
 import mass_spec_constants as ms_constants
-import molecule_predictors
 import similarity as similarity_lib
 
 
@@ -42,9 +41,6 @@ def get_similarities(raw_spectra_array):
 
     # Adjusting intensity to match default in molecule_predictors
     intensity_adjusted_spectra = tf.pow(spec_array_var, 0.5)
-
-    prediction_helper = molecule_predictors.get_prediction_helper('mlp')
-    hparams = prediction_helper.get_default_hparams()
 
     hparams = tf.contrib.training.HParams(
         mass_power=1.,
