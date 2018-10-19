@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image as PilImage
 import tensorflow as tf
+from rdkit.Chem import Draw
 
 IMAGE_SUBDIR_FOR_SPECTRA_PLOTS = 'images'
 
@@ -44,8 +45,10 @@ SPECTRA_PLOT_QUERY_SPECTRA_LEGEND_TEXT = 'Query Mass Spectrum'
 SPECTRA_PLOT_LIBRARY_MATCH_SPECTRA_LEGEND_TEXT = 'Library Matched Mass Spectrum'
 SPECTRA_PLOT_MAINLIB_SPECTRA_LEGEND_TEXT = 'Mainlib Spectrum'
 SPECTRA_PLOT_REPLICATES_SPECTRA_LEGEND_TEXT = 'Replicates Spectrum'
-SPECTRA_PLOT_X_AXIS_LABEL = 'mass/charge ratio'
-SPECTRA_PLOT_Y_AXIS_LABEL = 'relative intensity'
+SPECTRA_PLOT_X_AXIS_LABEL = 'Mass/Charge Ratio'
+SPECTRA_PLOT_Y_AXIS_LABEL = 'Relative Intensity'
+SPECTRA_PLOT_TEXT_SIZE = 16
+SPECTRAL_PLOT_YAXIS_LABEL_PAD = 15
 SPECTRA_PLOT_PLACE_LEGEND_ABOVE_CHART_KWARGS = {'ncol': 2}
 SPECTRA_PLOT_IMAGE_DIR_NAME = 'images'
 SPECTRA_PLOT_DIMENSIONS_RGB = (3000, 3000, 3)
@@ -118,14 +121,16 @@ def plot_true_and_predicted_spectra(
     bar_width = SPECTRA_PLOT_BAR_LINE_WIDTH * mz_max / ms_constants.MAX_PEAK_LOC
 
   figure = plt.figure(figsize=SPECTRA_PLOT_FIGURE_SIZE, dpi=300)
+  figure.patch.set_facecolor('white')
 
   # Adding extra subplot so both plots have common x-axis and y-axis labels
   ax_main = figure.add_subplot(111, frameon=False)
   ax_main.tick_params(
       labelcolor='none', top='off', bottom='off', left='off', right='off')
 
-  ax_main.set_xlabel(SPECTRA_PLOT_X_AXIS_LABEL)
-  ax_main.set_ylabel(SPECTRA_PLOT_Y_AXIS_LABEL)
+  ax_main.set_xlabel(SPECTRA_PLOT_X_AXIS_LABEL, fontsize=SPECTRA_PLOT_TEXT_SIZE)
+  ax_main.set_ylabel(SPECTRA_PLOT_Y_AXIS_LABEL, fontsize=SPECTRA_PLOT_TEXT_SIZE,
+                     labelpad=SPECTRAL_PLOT_YAXIS_LABEL_PAD)
 
   ax_top = figure.add_subplot(211, axisbg=SPECTRA_PLOT_BACKGROUND_COLOR)
 
@@ -401,3 +406,6 @@ def inchikeys_for_plotting(dataset_config_file, num_inchikeys_to_read,
                         num_inchikeys_to_read * eval_batch_size,
                         len(inchikey_list_for_plotting)))
   return inchikey_list_for_plotting
+
+
+
