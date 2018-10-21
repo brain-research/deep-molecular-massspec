@@ -6,6 +6,7 @@ import pandas as pd
 
 import sys
 import os
+import glob
 sys.path.append('/home/jennifer/git-files/deep-molecular-massspec/')
 
 import parse_sdf_utils
@@ -23,19 +24,43 @@ mainlib_inchikey_dict = train_test_split_utils.make_inchikey_dict(mol_list_17)
 replicates_mol_list_17 = parse_sdf_utils.get_sdf_to_mol('/mnt/storage/NIST_zipped/NIST17/replib_mend.sdf')
 replicates_inchikey_dict = train_test_split_utils.make_inchikey_dict(replicates_mol_list_17)
 
-# load predicted spectra dict
-predicted_spectra_dict = np.load('/tmp/mlp_bidirectional_predictions/no_family_test.npy').item()
-predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/fentanyl_test.npy').item())
-predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/steroid_test.npy').item())
-predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/no_family_validation.npy').item())
-predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/fentanyl_validation.npy').item())
-predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/steroid_validation.npy').item())
+def get_predictions_dict(path):
+  """Load a set of predictions as a dictionary given a path.
+  Args:
+    path: path containing spectra predictions as np.array, with results stored as dictionary
+  Output:
+    dict containing spectra predictions keyed by inchikey
+  """
+  prediction_filenames = glob.glob(path+'/*') 
+  predicted_spectra_dict = {}
+  for fname in prediction_filenames: 
+    predicted_spectra_dict.update(np.load(fname).item())
+  return predicted_spectra_dict
 
 
 def is_inchikey_valid(inchikey):
     return inchikey in mainlib_inchikey_dict
 
-def make_save_similarities(ikey_list, result_base_name='/tmp/similarity_results/', shard_idx=0, total_shard_number=0):
+def make_save_similarities(ikey_list, result_base_name='/tmp/similarity_results/', predictions_dir='/tmp/spectra_array_predictions/mlp_bidirectional_prediction', shard_idx=0, total_shard_number=0):
+    """Save similarity files for a list of inchikeys.
+    Args:
+      ikey_list: list of inchikeys to calculate the similarity of
+      result_base_name: Directory for storing results files
+      predictions_dir: Directory containing spectra predictions. Passed to get_predictions_dict
+      shard_idx: Shard number for use when recording shard number
+      total_shard_number: Total number of shards to make. Set to 0 to turn off this labeling
+    Output:
+      Saves a np.array for the following values. Each should have len(ikey_list) rows
+        inchikeys: List of inchikeys corresponding to other rows
+        mainlib_replib_similarities: Similarity measurment between mainlib spectrum 
+            and replicates spectra
+        overall_similarities: Overall similarities between all the spectra 
+            (including replicates to replicates)
+        mainlib_predicted_similarities: Similarity between mainlib spectrum and predicted spectrum
+        replicate_library_match_similarities: Similarity between the query spectrum from replicates
+            and the top ranked library matched spectrum
+
+    """
     mainlib_replib_similarities = []
     overall_similarities = []
     library_match_spectra = []
@@ -94,6 +119,7 @@ def make_save_similarities(ikey_list, result_base_name='/tmp/similarity_results/
     np.save(name_output_file('mainlib_replib_similarities'), mainlib_replib_similarities)
     np.save(name_output_file('overall_similarities'), overall_similarities)
  
+    predicted_spectra_dict = get_predictions_dict(predictions_dir) 
     predicted_spectra = np.array([predicted_spectra_dict[ikey] for ikey in ikey_list])
     mainlib_spectra = np.array([gather_similarities.make_spectra_array_from_mol(mainlib_inchikey_dict[ikey][0]) for ikey in ikey_list])
     replib_spectra = np.array([gather_similarities.make_spectra_array_from_mol(replicates_inchikey_dict[ikey][0]) for ikey in ikey_list])
@@ -104,10 +130,18 @@ def make_save_similarities(ikey_list, result_base_name='/tmp/similarity_results/
 
     replicate_library_match_similarities = gather_similarities.get_similarity_two_spectra_sets(replib_spectra, library_match_spectra) 
     np.save(name_output_file('replicate_library_match_similarities'), replicate_library_match_similarities)
-     
+ 
 
-if __name__ == '__main__':
-    model_results = make_plots_from_library.load_model_results('/mnt/storage/massspec_results/results_9_19/mlp_bidirectional_no_mass_filter.test.filter_False/95819.library_matching_predictions.txt')
+def get_predicted_similarities(ikey_list, prediction_dir, model_name, result_basename='/tmp/similarity_results/'):
+  """Gets predicted for molecules in the inchikey list."""
+  predicted_spectra_dict = get_predictions_dict(prediction_dir)
+  predicted_spectra = np.array([predicted_spectra_dict[ikey] for ikey in ikey_list])
+  mainlib_spectra = np.array([gather_similarities.make_spectra_array_from_mol(mainlib_inchikey_dict[ikey][0]) for ikey in ikey_list])
+  mainlib_predicted_similarities = gather_similarities.get_similarity_two_spectra_sets(mainlib_spectra, predicted_spectra)
+  np.save(result_basename + model_name, mainlib_predicted_similarities)
+
+
+def run_all_predicted_results(ikey_list): 
 
     results_dir = '/mnt/storage/massspec_misc/all_replicates_similarities/'
 
@@ -118,4 +152,12 @@ if __name__ == '__main__':
         end_idx = (i + 1) * shard_size
         if end_idx > len(model_results):
             end_idx = -1
-        make_save_similarities(model_results['query_ikey'][start_idx : end_idx].tolist(), results_dir, i, total_shards) 
+        make_save_similarities(ikey_list[start_idx : end_idx], results_dir, i, total_shards) 
+
+
+if __name__ == '__main__':
+    model_results = make_plots_from_library.load_model_results('/mnt/storage/massspec_results/results_9_19/mlp_bidirectional_no_mass_filter.test.filter_False/95819.library_matching_predictions.txt')
+    ikey_list = model_results['query_ikey'].tolist()
+
+    get_predicted_similarities(ikey_list, '/tmp/spectra_array_predictions/mlp_forward_predictions', 'mlp_forward_prediction', '/mnt/storage/massspec_misc/predicted_similarities/' )
+    # run_all_predicted_results(ikey_list)

@@ -142,9 +142,9 @@ def main():
     os.mkdir(image_dir)
 
   for key in inchikeys:
-    plot_mainlib_and_replicate_spectra(key, inchikey_dict, replicates_inchikey_dict, image_dir)
+    # plot_mainlib_and_replicate_spectra(key, inchikey_dict, replicates_inchikey_dict, image_dir)
     plot_predicted_and_mainlib_spectra(key, inchikey_dict, predicted_spectra_dict, image_dir)
-    plot_query_and_library_match_spectra(key, model_results, inchikey_dict, replicates_inchikey_dict, predicted_spectra_dict, image_dir)	
+    # plot_query_and_library_match_spectra(key, model_results, inchikey_dict, replicates_inchikey_dict, predicted_spectra_dict, image_dir)	
 
 if __name__ == '__main__':
 	main()
