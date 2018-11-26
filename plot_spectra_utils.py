@@ -47,6 +47,7 @@ SPECTRA_PLOT_MAINLIB_SPECTRA_LEGEND_TEXT = 'Mainlib Spectrum'
 SPECTRA_PLOT_REPLICATES_SPECTRA_LEGEND_TEXT = 'Replicates Spectrum'
 SPECTRA_PLOT_X_AXIS_LABEL = 'Mass/Charge Ratio'
 SPECTRA_PLOT_Y_AXIS_LABEL = 'Relative Intensity'
+SPECTRA_PLOT_LARGE_TICK_SIZE = 20
 SPECTRA_PLOT_TEXT_SIZE = 16
 SPECTRAL_PLOT_YAXIS_LABEL_PAD = 15
 SPECTRA_PLOT_PLACE_LEGEND_ABOVE_CHART_KWARGS = {'ncol': 2}
@@ -89,7 +90,8 @@ def plot_true_and_predicted_spectra(
     generated_dense_spectra,
     plot_mode_key=PlotModeKeys.PREDICTED_SPECTRUM,
     output_filename='',
-    rescale_mz_axis=False):
+    rescale_mz_axis=False,
+    large_tick_size=False):
   """Generates a plot comparing a true and predicted mass spec spectra.
 
   If output_filename given, saves a png file of the spectra, with the
@@ -176,6 +178,17 @@ def plot_true_and_predicted_spectra(
     ax.tick_params(axis='y', which='minor', right='off')
 
   ax_top.tick_params(axis='x', which='minor', top='off')
+
+  if large_tick_size:
+    ax_top.tick_params(axis='y', which='major', labelsize=SPECTRA_PLOT_LARGE_TICK_SIZE)
+    ax_bottom.tick_params(axis='y', which='major', labelsize=SPECTRA_PLOT_LARGE_TICK_SIZE)
+    ax_bottom.tick_params(axis='x', which='major', labelsize=SPECTRA_PLOT_LARGE_TICK_SIZE)
+    
+    # Resetting the main axis labels to be larger and have additional padding
+    ax_main.set_ylabel(SPECTRA_PLOT_Y_AXIS_LABEL, fontsize=SPECTRA_PLOT_LARGE_TICK_SIZE,
+                       labelpad=SPECTRA_PLOT_LARGE_TICK_SIZE + 5)
+    ax_main.set_xlabel(SPECTRA_PLOT_X_AXIS_LABEL, fontsize=SPECTRA_PLOT_LARGE_TICK_SIZE,
+                       labelpad=SPECTRA_PLOT_LARGE_TICK_SIZE + 5)
 
   if plot_mode_key == PlotModeKeys.PREDICTED_SPECTRUM:
     ax_top.legend((bar_top, bar_bottom),

@@ -28,6 +28,7 @@ import library_matching
 import molecule_predictors
 import parse_sdf_utils
 import tensorflow as tf
+import pickle as pkl
 
 FLAGS = tf.app.flags.FLAGS
 tf.flags.DEFINE_string(
@@ -55,7 +56,11 @@ tf.flags.DEFINE_string('warm_start_dir', None,
 tf.flags.DEFINE_enum('model_type', 'mlp',
                      molecule_predictors.MODEL_REGISTRY.keys(),
                      'Type of model to use.')
+tf.flags.DEFINE_enum('mode', 'train',
+                     ['train', 'evaluate'], 
+                     'Training mode to use.')
 OUTPUT_HPARAMS_CONFIG_FILE_BASE = 'command_line_arguments.txt'
+tf.logging.set_verbosity(tf.logging.INFO)
 
 
 def make_input_fn(dataset_config_file,
@@ -290,6 +295,17 @@ def make_estimator_and_inputs(run_config,
 
   return estimator, train_spec, eval_spec
 
+def make_eval_inputs_only(prediction_helper, dataset_config_file, hparams):
+  """Make Estimator-compatible Estimator and input_fn for eval"""
+  eval_input_fn = make_input_fn(
+      dataset_config_file=dataset_config_file,
+      hparams=hparams,
+      mode=tf.estimator.ModeKeys.EVAL,
+      features_to_load=prediction_helper.features_to_load(hparams),
+      load_library_matching_data=True)
+
+  return eval_input_fn 
+
 
 def main(_):
   prediction_helper = molecule_predictors.get_prediction_helper(
@@ -303,7 +319,18 @@ def main(_):
   (estimator, train_spec, eval_spec) = make_estimator_and_inputs(
       config, hparams, prediction_helper, FLAGS.dataset_config_file,
       FLAGS.train_steps, FLAGS.model_dir, FLAGS.warm_start_dir)
-  tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+  if FLAGS.mode == 'train':
+    tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+  elif FLAGS.mode == 'evaluate':
+    print('evaluating only')
+    eval_input_fn = make_eval_inputs_only(prediction_helper,
+        FLAGS.dataset_config_file, hparams)
+    results = estimator.evaluate(eval_input_fn)
+    with open('/tmp/models/results', 'w') as f:
+      pkl.dump(results, f)
+  else:
+    raise ValueError('mode type not supported')
+
 
 
 if __name__ == '__main__':

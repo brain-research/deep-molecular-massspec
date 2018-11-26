@@ -1,3 +1,7 @@
+"""
+Helper module for plotting spectral plots using existing prediction files and NIST sdf files. 
+"""
+
 import pandas as pd
 import os
 import glob
@@ -73,7 +77,8 @@ def plot_predicted_and_mainlib_spectra(inchikey, inchikey_dict, predicted_spectr
             predicted_spectra[0,:],
             plot_mode_key=plot_spectra_utils.PlotModeKeys.PREDICTED_SPECTRUM,
             output_filename=image_pathname,
-            rescale_mz_axis=True)
+            rescale_mz_axis=True,
+            large_tick_size=True)
     return 
  
  
@@ -122,12 +127,12 @@ def main():
   # grab library match prediction results
   model_results = load_model_results('/mnt/storage/massspec_results/results_9_19/mlp_bidirectional_no_mass_filter.test.filter_False/95819.library_matching_predictions.txt')
   
-  predicted_spectra_dict = np.load('/tmp/mlp_bidirectional_predictions/no_family_validation.npy').item()
-  predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/fentanyl_validation.npy').item())
-  predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/steroid_validation.npy').item())
-  predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/no_family_test.npy').item())
-  predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/fentanyl_test.npy').item())
-  predicted_spectra_dict.update(np.load('/tmp/mlp_bidirectional_predictions/steroid_test.npy').item())
+  predicted_spectra_dict = np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/no_family_validation.npy').item()
+  predicted_spectra_dict.update(np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/fentanyl_validation.npy').item())
+  predicted_spectra_dict.update(np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/steroid_validation.npy').item())
+  predicted_spectra_dict.update(np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/no_family_test.npy').item())
+  predicted_spectra_dict.update(np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/fentanyl_test.npy').item())
+  predicted_spectra_dict.update(np.load('/tmp/spectra_array_predictions/mlp_bidirectional_predictions/steroid_test.npy').item())
 
   # test_ikey = predicted_spectra_dict.keys()[0] 
   with open(FLAGS.inchikey_file) as f:
