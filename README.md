@@ -14,7 +14,10 @@ our model. This task is described in more detail below.
 ## Required packages:
 
 -   RDKit
--   Tensorflow
+-   Tensorflow (<= 1.12)
+-   Typing
+
+Note: This repository is only supported for python 2.
 
 ## Quickstart:
 
