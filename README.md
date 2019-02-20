@@ -11,6 +11,8 @@ which mimics the behavior currently used by experimental chemists. To test our
 predictions, we replace portions of the library with spectra predictions from
 our model. This task is described in more detail below.
 
+Link to the paper [here](https://arxiv.org/abs/1811.08545)
+
 ## Required packages:
 
 -   RDKit
