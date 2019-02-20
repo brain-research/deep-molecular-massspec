@@ -18,6 +18,7 @@ Link to the paper [here](https://arxiv.org/abs/1811.08545)
 -   RDKit
 -   Tensorflow (<= 1.12)
 -   Typing
+-   Matplotlib
 
 Note: This repository is only supported for python 2.
 
