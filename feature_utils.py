@@ -50,8 +50,8 @@ def get_smiles_string(mol):
 
 
 def get_molecular_formula(mol):
-    """Make String of molecular formula from rdkit.Mol"""
-    return AllChem.CalcMolFormula(mol)
+  """Makes string of molecular formula from rdkit.Mol."""
+  return AllChem.CalcMolFormula(mol)
 
 
 def parse_peaks(pk_str):
@@ -77,6 +77,22 @@ def parse_peaks(pk_str):
     peak_intensities.append(float(intensity))
 
   return peak_locs, peak_intensities
+
+
+def convert_spectrum_array_to_string(spectrum_array):
+  """Write a spectrum array to string.
+
+  Args:
+    spectrum_array : np.array of shape (1000)
+
+  Returns:
+    string representing the peaks of the spectra.
+  """
+  mz_peak_locations = np.nonzero(spectrum_array)[0].tolist()
+  mass_peak_strings = [
+      '%d %d' % (p, spectrum_array[p]) for p in mz_peak_locations
+  ]
+  return '\n'.join(mass_peak_strings)
 
 
 def get_largest_mass_spec_peak_loc(mol):
@@ -246,7 +262,7 @@ def check_mol_has_non_empty_smiles(mol):
 
 def check_mol_has_non_empty_mass_spec_peak_tag(mol):
   """Checks if mass spec sdf tag is in properties of rdkit.Mol."""
-  return ms_constants.SDF_TAG_MASS_SPEC_PEAKS in mol.GetPropsAsDict().keys()
+  return ms_constants.SDF_TAG_MASS_SPEC_PEAKS in mol.GetPropNames()
 
 
 def check_mol_only_has_atoms(mol, accept_atom_list):
@@ -294,6 +310,8 @@ def tokenize_smiles(smiles_string_arr):
   """
 
   smiles_str = smiles_string_arr[0]
+  if isinstance(smiles_str, bytes):
+    smiles_str = smiles_str.decode('utf-8')
 
   token_list = []
   ptr = 0

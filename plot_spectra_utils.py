@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Functions to add an evaluation metric that generates spectra plots."""
 from __future__ import print_function
 
@@ -23,6 +22,7 @@ import mass_spec_constants as ms_constants
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image as PilImage
+import six
 import tensorflow as tf
 
 IMAGE_SUBDIR_FOR_SPECTRA_PLOTS = 'images'
@@ -64,11 +64,14 @@ class PlotModeKeys(object):
   LIBRARY_MATCHED_SPECTRUM = 'library_match_spectrum'
 
 
-def name_plot_file(mode, query_inchikey, matched_inchikey=None, file_type='png'):
+def name_plot_file(mode, query_inchikey, matched_inchikey=None,
+                   file_type='png'):
+  """Generates name for spectra plot files."""
   if mode == PlotModeKeys.PREDICTED_SPECTRUM:
     return '{}.{}'.format(query_inchikey, file_type)
   elif mode == PlotModeKeys.LIBRARY_MATCHED_SPECTRUM:
-    return '{}_matched_to_{}.{}'.format(query_inchikey, matched_inchikey, file_type)
+    return '{}_matched_to_{}.{}'.format(query_inchikey, matched_inchikey,
+                                        file_type)
 
 
 def name_metric(mode, inchikey):
@@ -91,6 +94,9 @@ def plot_true_and_predicted_spectra(
     generated_dense_spectra : np.array representing the predicted mass spectra
     plot_mode_key: a PlotModeKeys instance
     output_filename : str path for saving generated image.
+    rescale_mz_axis: Setting to rescale m/z axis according to highest m/z peak
+        location.
+
   Returns:
     np.array of the bits of the generated matplotlib plot.
   """
@@ -98,14 +104,15 @@ def plot_true_and_predicted_spectra(
   if not rescale_mz_axis:
     x_array = np.arange(SPECTRA_PLOT_PEAK_LOC_LIMIT)
     bar_width = SPECTRA_PLOT_BAR_LINE_WIDTH
-    mz_max = SPECTRA_PLOT_PEAK_LOC_LIMIT 
+    mz_max = SPECTRA_PLOT_PEAK_LOC_LIMIT
   else:
-    mz_max = max(max(np.nonzero(true_dense_spectra)[0]),
-                 max(np.nonzero(generated_dense_spectra)[0]))
+    mz_max = max(
+        max(np.nonzero(true_dense_spectra)[0]),
+        max(np.nonzero(generated_dense_spectra)[0]))
     if mz_max + SPECTRA_PLOT_MZ_MAX_OFFSET < ms_constants.MAX_PEAK_LOC:
       mz_max += SPECTRA_PLOT_MZ_MAX_OFFSET
     else:
-        mz_max = ms_constants.MAX_PEAK_LOC
+      mz_max = ms_constants.MAX_PEAK_LOC
     x_array = np.arange(mz_max)
     true_dense_spectra = true_dense_spectra[:mz_max]
     generated_dense_spectra = generated_dense_spectra[:mz_max]
@@ -121,7 +128,10 @@ def plot_true_and_predicted_spectra(
   ax_main.set_xlabel(SPECTRA_PLOT_X_AXIS_LABEL)
   ax_main.set_ylabel(SPECTRA_PLOT_Y_AXIS_LABEL)
 
-  ax_top = figure.add_subplot(211, axisbg=SPECTRA_PLOT_BACKGROUND_COLOR)
+  if six.PY2:
+    ax_top = figure.add_subplot(211, axisbg=SPECTRA_PLOT_BACKGROUND_COLOR)
+  else:
+    ax_top = figure.add_subplot(211, facecolor=SPECTRA_PLOT_BACKGROUND_COLOR)
 
   bar_top = ax_top.bar(
       x_array,
@@ -136,7 +146,10 @@ def plot_true_and_predicted_spectra(
   ax_top.grid(
       color=SPECTRA_PLOT_GRID_COLOR, linewidth=SPECTRA_PLOT_BAR_GRID_LINE_WIDTH)
 
-  ax_bottom = figure.add_subplot(212, axisbg=SPECTRA_PLOT_BACKGROUND_COLOR)
+  if six.PY2:
+    ax_bottom = figure.add_subplot(212, axisbg=SPECTRA_PLOT_BACKGROUND_COLOR)
+  else:
+    ax_bottom = figure.add_subplot(212, facecolor=SPECTRA_PLOT_BACKGROUND_COLOR)
   figure.subplots_adjust(hspace=0.0)
 
   bar_bottom = ax_bottom.bar(
@@ -224,12 +237,11 @@ def make_plot(inchikey,
     plot_mode_key: A PlotModeKeys instance.
     update_img_flag: Boolean flag for whether to generate a spectra plot
     inchikeys_batch: inchikeys from the current batch
-    true_spectra_batch: np.array of all the true spectra from the current
-        batch.
+    true_spectra_batch: np.array of all the true spectra from the current batch.
     predictions: np.array of all predicted spectra from the current batch.
     image_directory: Location to save image directory, if set.
     library_match_inchikeys: np.array of strings, corresponding to inchikeys
-        that were the best matched from the library inchikey task.
+      that were the best matched from the library inchikey task.
 
   Returns:
     if update_img_flag: np.array
@@ -260,8 +272,9 @@ def make_plot(inchikey,
                                                     predicted_spectra_to_plot,
                                                     plot_mode_key, img_pathname)
     else:
-      spectra_arr = plot_true_and_predicted_spectra(
-          true_spectra_to_plot, predicted_spectra_to_plot, plot_mode_key)
+      spectra_arr = plot_true_and_predicted_spectra(true_spectra_to_plot,
+                                                    predicted_spectra_to_plot,
+                                                    plot_mode_key)
     return spectra_arr
   else:
     return np.zeros(SPECTRA_PLOT_DIMENSIONS_RGB, dtype=np.uint8)
@@ -284,11 +297,12 @@ def spectra_plot_summary_op(inchikey_list,
     true_spectra : tf Tensor array with true spectra for a batch
     prediction_batch: tf Tensor array of predicted spectra for a single batch.
     inchikey_to_plot: string InChI key contained in test set (but perhaps not in
-                      a particular batch).
+      a particular batch).
     plot_mode_key: A PlotModeKeys instance.
     library_match_inchikeys: tf Tensor of strings corresponding to the inchikeys
-        top match from the library matching task.
+      top match from the library matching task.
     image_directory: string of dir name to save plots
+
   Returns:
      tf.summary.image of the operation, and an update operator indicating if the
      summary has been updated or not.
@@ -338,14 +352,14 @@ def spectra_plot_summary_op(inchikey_list,
     # is in the batch. update_image_bool serves as a flag to tf.cond
     # to use the real update function if inchikey_to_plot is in the batch
     # and a fake one if not.
-    final_spectra_plot = tf.cond(update_image_bool, update_function,
-                                 lambda: spectra_plot_variable)
+    final_spectra_plot = tf.cond(update_image_bool,
+                                 update_function, lambda: spectra_plot_variable)
 
     update_op = final_spectra_plot
 
     return (tf.summary.image(
-        spectra_variable_name, spectra_plot_variable, collections=None),
-            update_op)
+        spectra_variable_name, spectra_plot_variable,
+        collections=None), update_op)
 
 
 def inchikeys_for_plotting(dataset_config_file, num_inchikeys_to_read,
@@ -357,10 +371,11 @@ def inchikeys_for_plotting(dataset_config_file, num_inchikeys_to_read,
 
   Args:
     dataset_config_file: dataset configuration file for experiment. Contains
-       filename of spectrum prediction inchikey text file.
+      filename of spectrum prediction inchikey text file.
     num_inchikeys_to_read: Number of inchikeys to use for plotting
     eval_batch_size: Number of inchikeys to skip before appending the next
-       inchikey from the text file.
+      inchikey from the text file.
+
   Returns:
     list [num_inchikeys_to_read] containing inchikey strings.
   """
@@ -368,9 +383,8 @@ def inchikeys_for_plotting(dataset_config_file, num_inchikeys_to_read,
   with tf.gfile.Open(dataset_config_file, 'r') as f:
     line = f.read()
     filenames = json.loads(line)
-    test_inchikey_list_name = os.path.splitext(
-        filenames[ds_constants.SPECTRUM_PREDICTION_TEST_KEY]
-        [0])[0] + '.inchikey.txt'
+    test_inchikey_list_name = os.path.splitext(filenames[
+        ds_constants.SPECTRUM_PREDICTION_TEST_KEY][0])[0] + '.inchikey.txt'
 
   inchikey_list_for_plotting = []
 

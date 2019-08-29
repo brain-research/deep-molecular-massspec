@@ -85,7 +85,7 @@ class UtilTest(tf.test.TestCase, parameterized.TestCase):
 
       self.assertAllEqual(results, expected_results)
 
-  @parameterized.parameters(('7'), ('10'), ('65'))
+  @parameterized.parameters((7), (10), (65))
   def test_map_predictor(self, sub_batch_size):
     input_op = {
         'a': tf.random_normal(shape=(50, 5)),

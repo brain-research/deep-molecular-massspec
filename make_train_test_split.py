@@ -57,6 +57,7 @@ import dataset_setup_constants as ds_constants
 import mass_spec_constants as ms_constants
 import parse_sdf_utils
 import train_test_split_utils
+import six
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
@@ -147,6 +148,9 @@ def make_mainlib_replicates_train_test_split(
       mainlib_mol_list)
   main_inchikey_list = main_inchikey_dict.keys()
 
+  if six.PY3:
+    main_inchikey_list = list(main_inchikey_list)
+
   if mainlib_maximum_num_molecules_to_use is not None:
     main_inchikey_list = random.sample(main_inchikey_list,
                                        mainlib_maximum_num_molecules_to_use)
@@ -154,6 +158,9 @@ def make_mainlib_replicates_train_test_split(
   replicates_inchikey_dict = train_test_split_utils.make_inchikey_dict(
       replicates_mol_list)
   replicates_inchikey_list = replicates_inchikey_dict.keys()
+
+  if six.PY3:
+    replicates_inchikey_list = list(replicates_inchikey_list)
 
   if replicates_maximum_num_molecules_to_use is not None:
     replicates_inchikey_list = random.sample(
@@ -192,13 +199,13 @@ def make_mainlib_replicates_train_test_split(
   }
 
   train_test_split_utils.assert_all_lists_mutally_exclusive(
-      component_inchikey_dict.values())
+      list(component_inchikey_dict.values()))
   # Test that the set of the 5 component inchikey lists is equal to the set of
   #   inchikeys in the main library.
-  all_inchikeys_in_components = [
-      ikey for ikey_list in component_inchikey_dict.values()
-      for ikey in ikey_list
-  ]
+  all_inchikeys_in_components = []
+  for ikey_list in list(component_inchikey_dict.values()):
+    for ikey in ikey_list:
+      all_inchikeys_in_components.append(ikey)
 
   assert set(main_inchikey_list + replicates_inchikey_list) == set(
       all_inchikeys_in_components
@@ -307,7 +314,7 @@ def combine_inchikey_sets(dataset_subdivision_list, dataset_split_dict):
   """A function to combine lists of inchikeys that are values from a dict.
 
   Args:
-    dataset_subdivision_list: List of keys in datset_split_dict to combine
+    dataset_subdivision_list: List of keys in dataset_split_dict to combine
         into one list
     dataset_split_dict: dict containing keys in dataset_subdivision_list, with
         lists of inchikeys as values.

@@ -19,3 +19,34 @@ presubmit: {
     action: SUBMIT
   }
 }
+
+# Ensures that all CLs are tested using TAP.
+presubmit: {
+  check_tests: {
+    # TAP projects to test with.
+    project: "deep_molecular_massspec"
+
+    # Prevent submitting without using tap_presubmit.
+    failure_status: ERROR
+
+    # When sending a CL for review, send the CL to TAP as well.
+    review_execute: true
+    review_execute_mode: ASYNCHRONOUS
+
+    # When trying to submit a CL, run the tests on TAP
+  }
+}
+
+# Ensures that the string "do not submit" (in all caps) is not present.
+presubmit: {
+  check_do_not_submit: {
+    action: SUBMIT
+  }
+}
+
+presubmit: {
+  check_lint: {
+    action: SUBMIT
+    failure_status: ERROR
+  }
+}

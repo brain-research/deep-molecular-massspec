@@ -1,0 +1,977 @@
+HYDROGEN
+ -MSLIB32-03140511252D 1   1.0         0.0    245692
+CAS rn = 1333740, Library ID = 1
+  2  1  0  0  0  0  0  0  0  0  0
+  -10.0000   15.0000    0.0000 H   0  0  0     0  0  0  0  0  0
+   10.0000   15.0000    0.0000 H   0  0  0     0  0  0  0  0  0
+  1  2  1  0  0  0  0
+M  END
+>  <NAME>
+Hydrogen
+
+>  <SYNONYMS>
+Dihydrogen
+o-Hydrogen
+p-Hydrogen
+Molecular hydrogen
+H2
+UN 1049
+UN 1966
+
+>  <INCHIKEY>
+UFHFLCQGNIYNRP-UHFFFAOYSA-N
+
+>  <FORMULA>
+H2
+
+>  <MW>
+2
+
+>  <EXACT MASS>
+2.01565006
+
+>  <CASNO>
+1333740
+
+>  <NISTNO>
+245692
+
+>  <ID>
+1
+
+>  <CONTRIBUTOR>
+American Petroleum Institute Research Project 44
+
+>  <NUM PEAKS>
+2
+
+>  <MASS SPECTRAL PEAKS>
+1 999
+
+>  <SPLASH>
+splash10-0udi-9000000000-57471f19a2742c7e8576
+
+$$$$
+DEUTERIUM
+ -MSLIB32-03140511252D 1   1.0         0.0     61316
+CAS rn = 7782390, Library ID = 2
+  2  1  0  0  0  0  0  0  0  0  0
+  -10.0000   15.0000    0.0000 H   1  0  0     0  0  0  0  0  0
+   10.0000   15.0000    0.0000 H   1  0  0     0  0  0  0  0  0
+  1  2  1  0  0  0  0
+M  END
+>  <NAME>
+Deuterium
+
+>  <SYNONYMS>
+D2
+UN 1957
+
+>  <INCHIKEY>
+UFHFLCQGNIYNRP-VVKOMZTBSA-N
+
+>  <FORMULA>
+D2
+
+>  <MW>
+4
+
+>  <EXACT MASS>
+4.02820355
+
+>  <CASNO>
+7782390
+
+>  <NISTNO>
+61316
+
+>  <ID>
+2
+
+>  <CONTRIBUTOR>
+D.HENNEBERG, MAX-PLANCK INSTITUTE, MULHEIM, WEST GERMANY
+
+>  <NUM PEAKS>
+2
+
+>  <MASS SPECTRAL PEAKS>
+10 15
+11 999
+
+>  <SPLASH>
+splash10-0udi-9000000000-e3178018cdcae643bd69
+
+$$$$
+DIAZIRINE
+ -MSLIB32-03140511252D 1   1.0         0.0    305841
+Library ID = 3
+  3  3  0  0  0  0  0  0  0  0  0
+   -8.0000   25.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   -8.0000    4.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+    8.0000   14.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  1  2  2  0  0  0  0
+  1  3  1  0  0  0  0
+  2  3  1  0  0  0  0
+M  END
+>  <NAME>
+Diazirine
+
+>  <INCHIKEY>
+GKVDXUXIAHWQIK-UHFFFAOYSA-N
+
+>  <FORMULA>
+CH2N2
+
+>  <MW>
+42
+
+>  <EXACT MASS>
+42.0217981
+
+>  <NISTNO>
+305841
+
+>  <ID>
+3
+
+>  <CONTRIBUTOR>
+A.Pleshkova, Nesmeyanov Inst.Org.Elem.Cpds, Moscow
+
+>  <NUM PEAKS>
+12
+
+>  <MASS SPECTRAL PEAKS>
+1 229
+3 22
+4 18
+5 58
+6 178
+7 23
+8 18
+9 999
+10 431
+11 8
+
+>  <SPLASH>
+splash10-03di-9000000000-ea5eb15f0c5809a07e9c
+
+$$$$
+METHANE, DIAZO-
+ -MSLIB32-03140511252D 1   1.0         0.0        57
+CAS rn = 334883, Library ID = 4
+  3  2  0  0  0  0  0  0  0  0  0
+   20.0000   15.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    0.0000   15.0000    0.0000 N   0  0  0     0  5  0  0  0  0
+  -20.0000   15.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  1  2  2  0  0  0  0
+  2  3  3  0  0  0  0
+M  END
+>  <NAME>
+Methane, diazo-
+
+>  <SYNONYMS>
+Azimethylene
+Diazomethane
+Acomethylene
+Diazirine
+Diazonium methylide
+
+>  <INCHIKEY>
+YXHKONLOYHBTNS-UHFFFAOYSA-N
+
+>  <FORMULA>
+CH2N2
+
+>  <MW>
+42
+
+>  <EXACT MASS>
+42.0217981
+
+>  <CASNO>
+334883
+
+>  <NISTNO>
+57
+
+>  <ID>
+4
+
+>  <CONTRIBUTOR>
+A.Pleshkova, Nesmeyanov Inst.Org.Elem.Cpds, Moscow
+
+>  <NUM PEAKS>
+12
+
+>  <MASS SPECTRAL PEAKS>
+22 110
+23 220
+24 999
+25 25
+26 12
+27 58
+28 179
+30 22
+31 110
+32 425
+
+>  <SPLASH>
+splash10-03di-9000000000-887a1b79377abdf643ab
+
+$$$$
+KETENE
+ -MSLIB32-03140511252D 1   1.0         0.0        55
+CAS rn = 463514, Library ID = 5
+  3  2  0  0  0  0  0  0  0  0  0
+   20.0000   15.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    0.0000   15.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -20.0000   15.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  1  2  2  0  0  0  0
+  2  3  2  0  0  0  0
+M  END
+>  <NAME>
+Ketene
+
+>  <SYNONYMS>
+Ethenone
+Carbomethene
+CH2CO
+Keto-ethylene
+Ethylenone #
+
+>  <INCHIKEY>
+CCGKOQOJPYTBIH-UHFFFAOYSA-N
+
+>  <FORMULA>
+C2H2O
+
+>  <MW>
+42
+
+>  <EXACT MASS>
+42.0105646
+
+>  <CASNO>
+463514
+
+>  <NISTNO>
+55
+
+>  <ID>
+5
+
+>  <CONTRIBUTOR>
+A.Pleshkova, Nesmeyanov Inst.Org.Elem.Cpds, Moscow
+
+>  <NUM PEAKS>
+16
+
+>  <MASS SPECTRAL PEAKS>
+22 125
+23 131
+24 999
+25 12
+26 10
+51 18
+54 44
+55 58
+56 16
+57 1
+58 113
+59 68
+61 265
+62 939
+63 21
+64 1
+
+>  <SPLASH>
+splash10-03dl-9000000000-0889d4d9b2559060b61c
+
+$$$$
+(4-(4-CHLORPHENYL)-3-MORPHOLINO-PYRROL-2-YL)-BUTENEDIOIC ACID, DIMETHYL ESTER
+ -MSLIB32-03140511252D 1   1.0         0.0    286647
+CAS rn = 164221378, Library ID = 6
+ 28 30  0  0  0  0  0  0  0  0  0
+  -29.0000   41.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -49.0000   39.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    9.0000    6.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   -8.0000   -6.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   38.0000   73.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   46.0000   55.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -21.0000   59.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -18.0000   25.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -61.0000   55.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -33.0000   75.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    2.0000   25.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -24.0000    6.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -53.0000   73.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -65.0000   89.0000    0.0000 Cl  0  0  0     0  1  0  0  0  0
+   28.0000   -0.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   14.0000   41.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   32.0000  -20.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   43.0000   13.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   34.0000   39.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    6.0000   59.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   18.0000   75.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   17.0000  -33.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   21.0000  -53.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   -2.0000  -27.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   62.0000    7.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   38.0000   33.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   66.0000  -13.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   40.0000  -59.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  1  2  2  0  0  0  0
+  1  7  1  0  0  0  0
+  1  8  1  0  0  0  0
+  2  9  1  0  0  0  0
+  3  4  1  0  0  0  0
+  3 15  1  0  0  0  0
+  3 11  2  0  0  0  0
+  4 12  1  0  0  0  0
+  5  6  1  0  0  0  0
+  5 21  1  0  0  0  0
+  6 19  1  0  0  0  0
+  7 10  2  0  0  0  0
+  8 11  1  0  0  0  0
+  8 12  2  0  0  0  0
+  9 13  2  0  0  0  0
+ 10 13  1  0  0  0  0
+ 11 16  1  0  0  0  0
+ 13 14  1  0  0  0  0
+ 15 17  2  0  0  0  0
+ 15 18  1  0  0  0  0
+ 16 19  1  0  0  0  0
+ 16 20  1  0  0  0  0
+ 17 22  1  0  0  0  0
+ 18 25  1  0  0  0  0
+ 18 26  2  0  0  0  0
+ 20 21  1  0  0  0  0
+ 22 23  1  0  0  0  0
+ 22 24  2  0  0  0  0
+ 23 28  1  0  0  0  0
+ 25 27  1  0  0  0  0
+M  END
+>  <NAME>
+(4-(4-Chlorphenyl)-3-morpholino-pyrrol-2-yl)-butenedioic acid, dimethyl ester
+
+>  <SYNONYMS>
+Dimethyl (2E)-2-[4-(4-chlorophenyl)-3-(4-morpholinyl)-1H-pyrrol-2-yl]-2-butenedioate #
+
+>  <INCHIKEY>
+PNYUDNYAXSEACV-RVDMUPIBSA-N
+
+>  <FORMULA>
+C20H21ClN2O5
+
+>  <MW>
+404
+
+>  <EXACT MASS>
+404.1139
+
+>  <CASNO>
+164221378
+
+>  <NISTNO>
+286647
+
+>  <ID>
+6
+
+>  <CONTRIBUTOR>
+Humboldt-Universitat zu Berlin, Department of Chemistry, Analytical Group
+
+>  <NUM PEAKS>
+349
+
+>  <MASS SPECTRAL PEAKS>
+32 12
+33 7
+34 28
+35 999
+36 57
+37 302
+38 975
+39 8
+40 53
+41 176
+42 99
+43 122
+44 117
+45 155
+46 9
+47 7
+49 6
+50 28
+51 59
+
+>  <ESTIMATED KOVATS RI>
+3150
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-014j-9863100000-c9f41f48e1159424c4f9
+
+$$$$
+1-METHYL-5-NITROPYRAZOLE
+ -MSLIB32-03140511252D 1   1.0         0.0    460697
+CAS rn = 54210332, Library ID = 7
+  9  9  0  0  0  0  0  0  0  0  0
+   28.0000  -11.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    7.0000  -11.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   33.0000    8.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+    1.0000    8.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   18.0000   19.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -15.0000   19.0000    0.0000 N   0  0  0     0  5  0  0  0  0
+   18.0000   40.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -15.0000   39.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  -32.0000    8.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  1  2  1  0  0  0  0
+  1  3  2  0  0  0  0
+  2  4  2  0  0  0  0
+  3  5  1  0  0  0  0
+  4  6  1  0  0  0  0
+  4  5  1  0  0  0  0
+  5  7  1  0  0  0  0
+  6  8  2  0  0  0  0
+  6  9  2  0  0  0  0
+M  END
+>  <NAME>
+1-Methyl-5-nitropyrazole
+
+>  <SYNONYMS>
+1-Methyl-5-nitro-1H-pyrazole #
+
+>  <INCHIKEY>
+COVPJOWITGLAKX-UHFFFAOYSA-N
+
+>  <FORMULA>
+C4H5N3O2
+
+>  <MW>
+127
+
+>  <EXACT MASS>
+127.0381765
+
+>  <CASNO>
+54210332
+
+>  <NISTNO>
+460697
+
+>  <ID>
+7
+
+>  <CONTRIBUTOR>
+V.A.Korolev, IOC RAS, Moscow, Russia
+
+>  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
+SemiStdNP=1061/0/1
+
+>  <NUM PEAKS>
+33
+
+>  <MASS SPECTRAL PEAKS>
+33 0
+34 42
+35 999
+36 276
+37 967
+38 959
+39 15
+50 162
+51 3
+52 36
+53 243
+56 24
+71 20
+68 60
+
+>  <ESTIMATED KOVATS RI>
+1087
+
+>  <RI ESTIMATION ERROR>
+83
+
+>  <SPLASH>
+splash10-0fb9-9000000000-df3d00bfc8b9827eb50e
+
+$$$$
+1H-1,2,4-TRIAZOL-5-AMINE, 3-BROMO-N,N-DIMETHYL-
+ -MSLIB32-03140511252D 1   1.0         0.0    460857
+Library ID = 8
+  9  9  0  0  0  0  0  0  0  0  0
+   -7.0000   48.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -17.0000   31.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   -7.0000   14.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -36.0000   30.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -13.0000   -5.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   13.0000   14.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+    3.0000  -18.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   19.0000   -5.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   36.0000  -16.0000    0.0000 Br  0  0  0     0  1  0  0  0  0
+  1  2  1  0  0  0  0
+  2  3  1  0  0  0  0
+  2  4  1  0  0  0  0
+  3  5  1  0  0  0  0
+  3  6  2  0  0  0  0
+  5  7  1  0  0  0  0
+  6  8  1  0  0  0  0
+  7  8  2  0  0  0  0
+  8  9  1  0  0  0  0
+M  END
+>  <NAME>
+1H-1,2,4-Triazol-5-amine, 3-bromo-N,N-dimethyl-
+
+>  <INCHIKEY>
+OWKPLCCVKXABQF-UHFFFAOYSA-N
+
+>  <FORMULA>
+C4H7BrN4
+
+>  <MW>
+190
+
+>  <EXACT MASS>
+189.985408
+
+>  <NISTNO>
+460857
+
+>  <ID>
+8
+
+>  <CONTRIBUTOR>
+V.A.Korolev, IOC RAS, Moscow, Russia
+
+>  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
+SemiStdNP=1691/0/1
+
+>  <NUM PEAKS>
+85
+
+>  <MASS SPECTRAL PEAKS>
+52 1
+53 24
+54 23
+55 64
+56 999
+57 7
+
+>  <ESTIMATED KOVATS RI>
+1369
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-00mo-9500000000-f162785d8e3edc892844
+
+$$$$
+N,N-DIMETHYL-4-(1,2,4-OXADIAZOL-3-YL)-1,2,5-OXADIAZOL-3-AMINE
+ -MSLIB32-03140511252D 1   1.0         0.0    436977
+Library ID = 9
+ 13 14  0  0  0  0  0  0  0  0  0
+   42.0000   45.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   25.0000   55.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  -13.0000    6.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -18.0000  -14.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   38.0000   26.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   10.0000   42.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   18.0000   24.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    8.0000    6.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -22.0000   24.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   -2.0000  -25.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+   14.0000  -14.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -13.0000   41.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -42.0000   24.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  1  2  1  0  0  0  0
+  1  5  2  0  0  0  0
+  2  6  1  0  0  0  0
+  3  4  2  0  0  0  0
+  3  8  1  0  0  0  0
+  3  9  1  0  0  0  0
+  4 10  1  0  0  0  0
+  5  7  1  0  0  0  0
+  6  7  2  0  0  0  0
+  7  8  1  0  0  0  0
+  8 11  2  0  0  0  0
+  9 12  1  0  0  0  0
+  9 13  1  0  0  0  0
+ 10 11  1  0  0  0  0
+M  END
+>  <NAME>
+N,N-Dimethyl-4-(1,2,4-oxadiazol-3-yl)-1,2,5-oxadiazol-3-amine
+
+>  <INCHIKEY>
+ASTNYHRQIBTGNO-UHFFFAOYSA-N
+
+>  <FORMULA>
+C6H7N5O2
+
+>  <MW>
+181
+
+>  <EXACT MASS>
+181.059975
+
+>  <NISTNO>
+436977
+
+>  <ID>
+9
+
+>  <CONTRIBUTOR>
+V.A.Korolev, Moscow, Russia
+
+>  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
+SemiStdNP=1488/0/1
+
+>  <NUM PEAKS>
+71
+
+>  <MASS SPECTRAL PEAKS>
+52 21
+53 16
+54 70
+55 999
+56 23
+
+>  <ESTIMATED KOVATS RI>
+1455
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-016r-9000000000-dbb43dc2834b3fb76680
+
+$$$$
+1,2-BIS(DIFLUOROAMINO)ETHANE
+ -MSLIB32-03140511252D 1   1.0         0.0    284323
+CAS rn = 15403233, Library ID = 10
+  8  7  0  0  0  0  0  0  0  0  0
+  -24.0000   20.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -24.0000   40.0000    0.0000 F   0  0  0     0  1  0  0  0  0
+   -7.0000    9.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -43.0000   10.0000    0.0000 F   0  0  0     0  1  0  0  0  0
+   10.0000   19.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   26.0000    9.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+   26.0000  -10.0000    0.0000 F   0  0  0     0  1  0  0  0  0
+   44.0000   18.0000    0.0000 F   0  0  0     0  1  0  0  0  0
+  1  2  1  0  0  0  0
+  1  3  1  0  0  0  0
+  1  4  1  0  0  0  0
+  3  5  1  0  0  0  0
+  5  6  1  0  0  0  0
+  6  7  1  0  0  0  0
+  6  8  1  0  0  0  0
+M  END
+>  <NAME>
+1,2-Bis(difluoroamino)ethane
+
+>  <INCHIKEY>
+PVVBOXUQVSZBMK-UHFFFAOYSA-N
+
+>  <FORMULA>
+C2H4F4N2
+
+>  <MW>
+132
+
+>  <EXACT MASS>
+132.031061
+
+>  <CASNO>
+15403233
+
+>  <NISTNO>
+284323
+
+>  <ID>
+10
+
+>  <CONTRIBUTOR>
+A.Pleshkova, Nesmeyanov Inst.Org.Elem.Cpds, Moscow
+
+>  <NUM PEAKS>
+17
+
+>  <MASS SPECTRAL PEAKS>
+45 999
+46 12
+47 257
+48 646
+49 15
+76 422
+77 6
+
+>  <ESTIMATED KOVATS RI>
+210
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-016r-9000000000-0b4c48103cd3517c5bc5
+
+$$$$
+1H-PYRAZOLE-5-CARBOXALDEHYDE, 1-ETHENYL-, OXIME (ISOMER 2)
+ -MSLIB32-03140511252D 1   1.0         0.0    460677
+Library ID = 84
+ 10 10  0  0  0  0  0  0  0  0  0
+    7.0000   16.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   24.0000   26.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -43.0000  -16.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -27.0000   -5.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -10.0000   26.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   43.0000   16.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  -17.0000   45.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -27.0000   14.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -37.0000   45.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -42.0000   26.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  1  2  2  0  0  0  0
+  1  5  1  0  0  0  0
+  2  6  1  0  0  0  0
+  3  4  2  0  0  0  0
+  4  8  1  0  0  0  0
+  5  7  2  0  0  0  0
+  5  8  1  0  0  0  0
+  7  9  1  0  0  0  0
+  8 10  1  0  0  0  0
+  9 10  2  0  0  0  0
+M  END
+>  <NAME>
+1H-Pyrazole-5-carboxaldehyde, 1-ethenyl-, oxime (isomer 2)
+
+>  <INCHIKEY>
+UCIXUAPVXAZYDQ-VMPITWQZSA-N
+
+>  <FORMULA>
+C6H7N3O
+
+>  <MW>
+137
+
+>  <EXACT MASS>
+137.058912
+
+>  <NISTNO>
+460677
+
+>  <ID>
+84
+
+>  <CONTRIBUTOR>
+V.A.Korolev, IOC RAS, Moscow, Russia
+
+>  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
+SemiStdNP=1402/0/1
+
+>  <NUM PEAKS>
+25
+
+>  <MASS SPECTRAL PEAKS>
+35 14
+35 2
+36 152
+37 999
+38 588
+
+>  <ESTIMATED KOVATS RI>
+1249
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-004i-9100000000-85e577bb1b27a8073fc5
+
+$$$$
+1H-PYRAZOLE-5-CARBOXALDEHYDE, 1-ETHENYL-, OXIME (ISOMER 1)
+ -MSLIB32-03140511252D 1   1.0         0.0    460676
+Library ID = 94
+ 10 10  0  0  0  0  0  0  0  0  0
+    7.0000   16.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   24.0000   26.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -43.0000  -16.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -27.0000   -5.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -10.0000   26.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   43.0000   16.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  -17.0000   45.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -27.0000   14.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  -37.0000   45.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -42.0000   26.0000    0.0000 N   0  0  0     0  3  0  0  0  0
+  1  2  2  0  0  0  0
+  1  5  1  0  0  0  0
+  2  6  1  0  0  0  0
+  3  4  2  0  0  0  0
+  4  8  1  0  0  0  0
+  5  7  2  0  0  0  0
+  5  8  1  0  0  0  0
+  7  9  1  0  0  0  0
+  8 10  1  0  0  0  0
+  9 10  2  0  0  0  0
+M  END
+>  <NAME>
+1H-Pyrazole-5-carboxaldehyde, 1-ethenyl-, oxime (isomer 1)
+
+>  <INCHIKEY>
+UCIXUAPVXAZYDQ-VMPITWQZSA-N
+
+>  <FORMULA>
+C6H7N3O
+
+>  <MW>
+137
+
+>  <EXACT MASS>
+137.058912
+
+>  <NISTNO>
+460676
+
+>  <ID>
+94
+
+>  <CONTRIBUTOR>
+V.A.Korolev, IOC RAS, Moscow, Russia
+
+>  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
+SemiStdNP=1393/0/1
+
+>  <NUM PEAKS>
+25
+
+>  <MASS SPECTRAL PEAKS>
+35 36
+36 127
+37 999
+38 390
+
+>  <ESTIMATED KOVATS RI>
+1249
+
+>  <RI ESTIMATION ERROR>
+89
+
+>  <SPLASH>
+splash10-004r-9100000000-0271e98f6046a29a34df
+
+$$$$
+2-PROPANOL, 2-METHYL-, LITHIUM SALT
+ -MSLIB32-03140511252D 1   1.0         0.0     63492
+CAS rn = 14322839, Library ID = 33329
+  6  5  0  0  0  0  0  0  0  0  0
+    0.0000  -10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    0.0000   10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+  -20.0000   10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+   20.0000   10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
+    0.0000   30.0000    0.0000 O   0  0  0     0  2  0  0  0  0
+  -17.0000   40.0000    0.0000 Li  0  0  0     0  1  0  0  0  0
+  1  2  1  0  0  0  0
+  2  3  1  0  0  0  0
+  2  4  1  0  0  0  0
+  2  5  1  0  0  0  0
+  5  6  1  0  0  0  0
+M  END
+>  <NAME>
+2-Propanol, 2-methyl-, lithium salt
+
+>  <SYNONYMS>
+2-Methyl-2-propanol #
+
+>  <SALT>
+Li(LiL) =3,4,5,6
+
+>  <INCHIKEY>
+LZWQNOHZMQIFBX-UHFFFAOYSA-N
+
+>  <FORMULA>
+C4H9LiO
+
+>  <MW>
+80
+
+>  <EXACT MASS>
+80.0813446
+
+>  <CASNO>
+14322839
+
+>  <NISTNO>
+63492
+
+>  <ID>
+33329
+
+>  <CONTRIBUTOR>
+D.HENNEBERG, MAX-PLANCK INSTITUTE, MULHEIM, WEST GERMANY
+
+>  <NUM PEAKS>
+220
+
+>  <MASS SPECTRAL PEAKS>
+18 8
+19 999
+80 34
+81 2
+85 9
+87 0
+88 0
+89 0
+568 0
+576 0
+577 0
+578 0
+579 1
+580 1
+581 8
+582 2
+583 0
+587 1
+
+>  <SPLASH>
+splash10-0a4j-9071800000-d025ecb60120ffb64dbb
+
+$$$$
+Argon
+
+No Structure
+  0  0  0  0  0  0  0  0  0  0  0
+M  END
+>  <NAME>
+Argon
+
+>  <SYNONYMS>
+Ar
+UN 1006
+UN 1951
+argon atom
+
+>  <INCHIKEY>
+XKRFYHLGVUSROY-UHFFFAOYSA-N
+
+>  <FORMULA>
+Ar
+
+>  <MW>
+40
+
+>  <EXACT MASS>
+39.962383
+
+>  <CASNO>
+7440371
+
+>  <MASS SPECTRAL PEAKS>
+22 116
+28 999
+
+>  <SPLASH>
+splash10-0006-9000000000-10acb943ad8ac24e1e71
+
+$$$$

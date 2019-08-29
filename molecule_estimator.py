@@ -22,39 +22,41 @@ from __future__ import print_function
 import json
 import os
 
+from absl import flags
 import dataset_setup_constants as ds_constants
 import feature_map_constants as fmap_constants
 import library_matching
 import molecule_predictors
 import parse_sdf_utils
+import six
 import tensorflow as tf
 
-FLAGS = tf.app.flags.FLAGS
-tf.flags.DEFINE_string(
+FLAGS = flags.FLAGS
+flags.DEFINE_string(
     'dataset_config_file', None,
     'JSON file specifying the various filenames necessary for training and '
     'evaluation. See make_input_fn() for more details.')
-tf.flags.DEFINE_string(
+flags.DEFINE_string(
     'hparams', '', 'Hyperparameter values to override the defaults.'
     'Format: params1=value1,params2=value2, ...'
     'Possible parameters: max_atoms, max_mass_spec_peak_loc,'
     'batch_size, epochs, do_linear_regression,'
     'get_mass_spec_features, init_weights, init_bias')
-tf.flags.DEFINE_integer('train_steps', None,
-                        'The number of steps to run training for.')
-tf.flags.DEFINE_integer(
+flags.DEFINE_integer('train_steps', None,
+                     'The number of steps to run training for.')
+flags.DEFINE_integer(
     'train_steps_per_iteration', 1000,
     'how frequently to evaluate (only used when schedule =='
     ' continuous_train_and_eval')
 
-tf.flags.DEFINE_string('model_dir', '',
-                       'output directory for checkpoints and events files')
-tf.flags.DEFINE_string('warm_start_dir', None,
-                       'directory to warm start model from')
+flags.DEFINE_string('model_dir', '',
+                    'output directory for checkpoints and events files')
+flags.DEFINE_string('warm_start_dir', None,
+                    'directory to warm start model from')
 
-tf.flags.DEFINE_enum('model_type', 'mlp',
-                     molecule_predictors.MODEL_REGISTRY.keys(),
-                     'Type of model to use.')
+flags.DEFINE_enum('model_type', 'mlp',
+                  molecule_predictors.MODEL_REGISTRY.keys(),
+                  'Type of model to use.')
 OUTPUT_HPARAMS_CONFIG_FILE_BASE = 'command_line_arguments.txt'
 
 
@@ -187,7 +189,8 @@ def _log_command_line_string(model_type, model_dir, hparams):
   # Note that the rendered string will not be able to be parsed using
   # hparams.parse() if any of the hparam values have commas or '=' signs.
   hparams_string = ','.join(
-      ['%s=%s' % (key, value) for key, value in hparams.values().iteritems()])
+      ['%s=%s' % (key, value) for key, value in six.iteritems(
+          hparams.values())])
 
   config_string += ' --hparams=%s\n' % hparams_string
   output_file = os.path.join(model_dir, OUTPUT_HPARAMS_CONFIG_FILE_BASE)

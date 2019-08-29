@@ -19,3 +19,11 @@ def test_dir(relative_path):
   return os.path.join(flags.FLAGS.test_srcdir,
                       os.path.split(os.path.abspath(__file__))[0],
                       relative_path)
+
+
+def encode(value, is_py3_flag):
+  """A helper function for wrapping strings as bytes for py3."""
+  if is_py3_flag:
+    return value.encode('utf-8')
+  else:
+    return value

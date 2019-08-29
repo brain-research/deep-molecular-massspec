@@ -5,6 +5,7 @@
 include "devtools/blueprint/ncl/blueprint_file.ncl";
 
 blueprint_file = ::blueprint::BlueprintFile(
+  teams_product_id = 9498658188,
   project_name = "organic-molecule-massspec",
   tech_lead = ["dbelanger"],
   mdb_groups = ["organic-molecule-massspec"],
@@ -20,6 +21,9 @@ blueprint_file = ::blueprint::BlueprintFile(
       enable_continuous_build = false,
       enable_coverage = true,
       test_patterns = ["//third_party/py/deep_molecular_massspec/..."],
+      build_flags = [
+        "--compilation_mode=opt",
+      ],
       tap_settings = tap::TapBuildableUnitSettings(on_demand = true),
     ),
   ],
