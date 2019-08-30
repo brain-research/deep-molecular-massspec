@@ -1,9 +1,12 @@
-# Deep learning for Electron Ionization mass spectrometry for organic molecules(https://github.com/brain-research/deep-molecular-massspec/blob/master/toc.jpeg?raw=true)
+# Deep learning for Electron Ionization mass spectrometry for organic molecules
+![TOC](https://github.com/brain-research/deep-molecular-massspec/blob/master/neims_toc.jpeg?raw=true)
 
 This repository accompanies
 
-Rapid Prediction of Electron–Ionization Mass Spectrometry Using Neural Networks\
-Jennifer N. Wei, David Belanger, Ryan P. Adams, and D. Sculley\
+[Rapid Prediction of Electron–Ionization Mass Spectrometry Using Neural Networks](https://pubs.acs.org/doi/10.1021/acscentsci.9b00085)\
+[Jennifer N. Wei](https://ai.google/research/people/JenniferNWei),
+[David Belanger](https://davidbelanger.github.io/), [Ryan P. Adams](https://www.cs.princeton.edu/~rpa/),
+and [D. Sculley](https://www.eecs.tufts.edu/~dsculley/)\
 ACS Central Science 2019 5 (4), 700-708\
 DOI: 10.1021/acscentsci.9b00085
 
@@ -21,8 +24,9 @@ our model. This task is described in more detail below.
 
 ## Required packages:
 
--   RDKit
--   Tensorflow
+It is recommended to use [Anaconda](https://www.anaconda.com/distribution/) with a Python 3.6 environment to install these packages.
+-   [RDKit](https://www.rdkit.org/docs/Install.html)
+-   [Tensorflow](https://www.tensorflow.org/install)
 
 ## Quickstart Guide for making model predictions
 
