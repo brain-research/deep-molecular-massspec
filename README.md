@@ -22,13 +22,13 @@ which mimics the behavior currently used by experimental chemists. To test our
 predictions, we replace portions of the library with spectra predictions from
 our model. This task is described in more detail below.
 
-## Required packages:
+## Required Packages:
 
 It is recommended to use [Anaconda](https://www.anaconda.com/distribution/) with a Python 3.6 environment to install these packages.
 -   [RDKit](https://www.rdkit.org/docs/Install.html)
 -   [Tensorflow](https://www.tensorflow.org/install)
 
-## Quickstart Guide for making model predictions
+## Quickstart Guide for Making Model Predictions
 
 1. Create a directory and download the weights for the model.
 
