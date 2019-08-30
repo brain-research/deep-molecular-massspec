@@ -33,7 +33,8 @@ It is recommended to use [Anaconda](https://www.anaconda.com/distribution/) with
 1. Create a directory and download the weights for the model.
 
 ```
-$ MODEL_WEIGHTS_DIR=/tmp/neims_model
+$ MODEL_WEIGHTS_DIR=/home/path/to/model
+$ mkdir $MODEL_WEIGHTS_DIR
 $ pushd $MODEL_WEIGHTS_DIR
 $ wget https://storage.googleapis.com/deep-molecular-massspec/massspec_weights/massspec_weights.zip
 $ unzip massspec_weights.zip
