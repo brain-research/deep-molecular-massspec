@@ -30,12 +30,14 @@ import parse_sdf_utils
 import test_utils
 import numpy as np
 from rdkit import Chem
+import six
 import tensorflow as tf
 
 
 class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
 
   def setUp(self):
+    super(ParseSdfUtilsTest, self).setUp()
     self.test_data_directory = test_utils.test_dir('testdata/')
     self.test_file_long = os.path.join(self.test_data_directory,
                                        'test_14_mend.sdf')
@@ -249,14 +251,19 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
               self.hparams.max_mass_spec_peak_loc))
 
   def tearDown(self):
-    tf.gfile.DeleteRecursively(self.temp_dir)
+    tf.io.gfile.rmtree(self.temp_dir)
+    super(ParseSdfUtilsTest, self).tearDown()
+
+  def encode(self, value):
+    """Wrapper function for encoding strings in python 3."""
+    return test_utils.encode(value, six.PY3)
 
   def test_get_sdf_to_mol(self):
     """Check the contents of the molecules parsed by rdkit.
     """
     mol_output = parse_sdf_utils.get_sdf_to_mol(
         self.test_file_long, max_atoms=self.hparams.max_atoms)
-    self.assertEqual(len(mol_output), 12)
+    self.assertLen(mol_output, 12)
     self.assertIsInstance(mol_output[0], Chem.rdchem.Mol)
     self.assertIsInstance(Chem.MolToSmiles(mol_output[0]), str)
     self.assertEqual(
@@ -278,13 +285,13 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
     mol_list = parse_sdf_utils.get_sdf_to_mol(self.test_file_long)
     filtered_mol_list = parse_sdf_utils.filter_mol_list_by_prop(
         mol_list, 'CONTRIBUTOR', 'Moscow', wanted=True)
-    self.assertEqual(len(filtered_mol_list), 9)
+    self.assertLen(filtered_mol_list, 9)
 
   def test_find_inchikey_duplicates(self):
     """Test finding duplicate inchi keys in list of molecules."""
     mol_list = parse_sdf_utils.get_sdf_to_mol(self.test_file_long)
     dup_dict = parse_sdf_utils.find_inchikey_duplicates(mol_list)
-    self.assertEqual(len(dup_dict), 1)
+    self.assertLen(dup_dict, 1)
 
   def test_all_circular_fingerprints_to_dict(self):
     """Test construction of fingerprints."""
@@ -361,7 +368,7 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
     for i in range(len(self.expected_mol_dicts)):
       mol_dict_key_names = [
           fmap_constants.NAME, fmap_constants.INCHIKEY,
-          fmap_constants.SMILES, fmap_constants.MOLECULAR_FORMULA,
+          fmap_constants.SMILES, fmap_constants.MOLECULAR_FORMULA
       ]
       for kwarg in mol_dict_key_names:
         self.assertEqual(self.expected_mol_dicts[i][kwarg], mol_dicts[i][kwarg])
@@ -381,8 +388,8 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
   def _validate_info_file(self, mol_list, fpath):
     with open(fpath + '.info') as f:
       lines = f.readlines()
-      self.assertEqual(len(lines), 1)
-      self.assertEqual(int(lines[0]), len(mol_list))
+      self.assertLen(lines, 1)
+      self.assertLen(lines[0], len(mol_list))
 
   def test_dict_tfexample(self):
     """Check if the contents of tf.Records is the same as input molecule info.
@@ -437,15 +444,6 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
           .flatten(),
           self.expected_mol_dicts[i][fmap_constants.ADJACENCY_MATRIX],
           delta=0.0001)
-      self.assertEqual(
-          feature_values[fmap_constants.NAME][i],
-          self.expected_mol_dicts[i][fmap_constants.NAME])
-      self.assertEqual(
-          feature_values[fmap_constants.INCHIKEY][i],
-          self.expected_mol_dicts[i][fmap_constants.INCHIKEY])
-      self.assertEqual(
-          feature_values[fmap_constants.MOLECULAR_FORMULA][i],
-          self.expected_mol_dicts[i][fmap_constants.MOLECULAR_FORMULA])
       self.assertSequenceAlmostEqual(
           feature_values[fmap_constants.DENSE_MASS_SPEC][i],
           self.expected_mol_dicts[i][fmap_constants.DENSE_MASS_SPEC],
@@ -458,6 +456,17 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
           feature_values[fmap_constants.ATOM_IDS][i],
           self.expected_mol_dicts[i][fmap_constants.ATOM_IDS],
           delta=0.0001)
+      self.assertEqual(
+          feature_values[fmap_constants.NAME][i],
+          self.encode(self.expected_mol_dicts[i][fmap_constants.NAME]))
+      self.assertEqual(
+          feature_values[fmap_constants.INCHIKEY][i],
+          self.encode(
+              self.expected_mol_dicts[i][fmap_constants.INCHIKEY]))
+      self.assertEqual(
+          feature_values[fmap_constants.MOLECULAR_FORMULA][i],
+          self.encode(
+              self.expected_mol_dicts[i][fmap_constants.MOLECULAR_FORMULA]))
       self.assertAllEqual(feature_values[fmap_constants.SMILES][i],
                           self.expected_mol_dicts[i]['parsed_smiles'])
       self.assertAllEqual(
@@ -558,11 +567,12 @@ class ParseSdfUtilsTest(tf.test.TestCase, absltest.TestCase):
           mol_dicts[i][fmap_constants.ADJACENCY_MATRIX],
           delta=0.0001)
       self.assertEqual(feature_values[fmap_constants.NAME][i],
-                       mol_dicts[i][fmap_constants.NAME])
+                       self.encode(mol_dicts[i][fmap_constants.NAME]))
       self.assertEqual(feature_values[fmap_constants.INCHIKEY][i],
-                       mol_dicts[i][fmap_constants.INCHIKEY])
-      self.assertEqual(feature_values[fmap_constants.MOLECULAR_FORMULA][i],
-                       mol_dicts[i][fmap_constants.MOLECULAR_FORMULA])
+                       self.encode(mol_dicts[i][fmap_constants.INCHIKEY]))
+      self.assertEqual(
+          feature_values[fmap_constants.MOLECULAR_FORMULA][i],
+          self.encode(mol_dicts[i][fmap_constants.MOLECULAR_FORMULA]))
       self.assertSequenceAlmostEqual(
           feature_values[fmap_constants.DENSE_MASS_SPEC][i],
           mol_dicts[i][fmap_constants.DENSE_MASS_SPEC],

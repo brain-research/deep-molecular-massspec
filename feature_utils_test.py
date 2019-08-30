@@ -78,6 +78,20 @@ class FeatureUtilsTest(tf.test.TestCase):
     result = [filter_fn(mol) for mol in self.test_mols]
     self.assertAllEqual(result, [False, False, False, True])
 
+  def test_convert_spectrum_array_to_string(self):
+    spectra_array = np.zeros((2, 1000))
+    spectra_array[0, 3] = 100
+    spectra_array[1, 39] = 100
+    spectra_array[1, 21] = 60
+
+    expected_spectra_strings = ['3 100', '21 60\n39 100']
+    result_spectra_strings = []
+    for idx in range(np.shape(spectra_array)[0]):
+      result_spectra_strings.append(
+          feature_utils.convert_spectrum_array_to_string(spectra_array[idx, :]))
+
+    self.assertAllEqual(expected_spectra_strings, result_spectra_strings)
+
 
 if __name__ == '__main__':
   tf.test.main()

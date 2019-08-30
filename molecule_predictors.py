@@ -83,7 +83,7 @@ class MassSpectraPrediction(object):
 
     return hparams_to_tune + self._get_model_specific_hparam_for_tuning()
 
-  def _fingerprints_to_use(self, hparams):
+  def fingerprints_to_use(self, hparams):
     if hparams.use_counting_fp:
       key = fmap_constants.COUNTING_CIRCULAR_FP_BASENAME
     else:
@@ -383,7 +383,7 @@ class MLPSpectraPrediction(MassSpectraPrediction):
     hparams.add_hparam('radius', 2)
 
   def _get_model_specific_feature_names(self, hparams):
-    return [self._fingerprints_to_use(hparams)]
+    return [self.fingerprints_to_use(hparams)]
 
   def _get_model_specific_hparam_for_tuning(self):
     return ['num_hidden_units', 'dropout_rate', 'num_hidden_layers']
@@ -410,7 +410,7 @@ class MLPSpectraPrediction(MassSpectraPrediction):
 
     activation_fn = getattr(tf.nn, hparams.hidden_layer_activation)
 
-    feature_to_use = self._fingerprints_to_use(hparams)
+    feature_to_use = self.fingerprints_to_use(hparams)
     layer_output = feature_dict[feature_to_use]
 
     if hparams.num_hidden_layers > 0:

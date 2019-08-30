@@ -22,7 +22,7 @@ written to a tf.record.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from collections import Counter
+import collections
 
 
 from absl import logging
@@ -31,10 +31,9 @@ import feature_utils
 import mass_spec_constants as ms_constants
 import numpy as np
 from rdkit import Chem
+import six
 import tensorflow as tf
 
-# TODO: Implement better shuffling across input files so we don't require a large shuffle
-#       buffer.
 SHUFFLE_BUFFER_SIZE = 200000
 
 
@@ -55,7 +54,7 @@ def find_inchikey_duplicates(mol_list):
   if len(inchi_key_list) == len(set(inchi_key_list)):
     return {}
 
-  count = Counter(inchi_key_list)
+  count = collections.Counter(inchi_key_list)
   dup_dict = dict((kwarg, count[kwarg]) for kwarg in count if count[kwarg] > 1)
   logging.info('Found %s duplicates', str(len(dup_dict)))
   return dup_dict
@@ -120,7 +119,7 @@ def get_sdf_to_mol(
   def _mol_passes_filters(mol):
     """A helper function for testing mols on all filtering conditions."""
     if not feature_utils.check_mol_has_non_empty_mass_spec_peak_tag(mol):
-        return False
+      return False
 
     filter_list = []
     filter_list.append(feature_utils.check_mol_has_non_empty_smiles(mol))
@@ -223,7 +222,7 @@ def make_mol_dict(mol,
           properties by the rdkit.Mol
     max_atoms : maximum number of allowed atoms.
     max_mass_spec_peak_loc : largest mass/charge ratio to allow in a spectra
-    add_hs_to_molecule : Whehter or not to include hydrogen atoms in the
+    add_hs_to_molecule : Whether or not to include hydrogen atoms in the
         molecule
 
   Returns:
@@ -302,13 +301,13 @@ def dict_to_tfexample(mol_dict):
   feature_map[fmap_constants.DENSE_MASS_SPEC].float_list.value.extend(
       mol_dict[fmap_constants.DENSE_MASS_SPEC])
   feature_map[fmap_constants.INCHIKEY].bytes_list.value.append(
-      mol_dict[fmap_constants.INCHIKEY])
+      mol_dict[fmap_constants.INCHIKEY].encode('utf-8'))
   feature_map[fmap_constants.MOLECULAR_FORMULA].bytes_list.value.append(
-      mol_dict[fmap_constants.MOLECULAR_FORMULA])
+      mol_dict[fmap_constants.MOLECULAR_FORMULA].encode('utf-8'))
   feature_map[fmap_constants.NAME].bytes_list.value.append(
-      mol_dict[fmap_constants.NAME])
+      mol_dict[fmap_constants.NAME].encode('utf-8'))
   feature_map[fmap_constants.SMILES].bytes_list.value.append(
-      mol_dict[fmap_constants.SMILES])
+      mol_dict[fmap_constants.SMILES].encode('utf-8'))
 
   if fmap_constants.INDEX_TO_GROUND_TRUTH_ARRAY in mol_dict:
     feature_map[
@@ -428,7 +427,7 @@ def postprocess_spectrum(spectrum, hparams):
 def make_padded_shapes_for_dataset(dataset):
   """Makes a deep copy of dataset.output_shapes."""
   dataset_padded_shapes = {
-      k: tf.TensorShape(v) for k, v in dataset.output_shapes.iteritems()
+      k: tf.TensorShape(v) for k, v in six.iteritems(dataset.output_shapes)
   }
   return dataset_padded_shapes
 
@@ -445,7 +444,7 @@ def _parse_example(example_protos, hparams, features_to_load):
     features_to_load: list of string keys of fields to load from the
       TFRecords. If None (default), all available fields are loaded.
   Returns:
-    Dict containing functions for parsing featuers from a TF.Record.
+    Dict containing functions for parsing features from a TFRecord.
   """
   features = {
       fmap_constants.MOLECULE_WEIGHT:
@@ -557,14 +556,13 @@ def get_dataset_from_record(fnames,
     A tf.Dataset
 
   Raises:
-    ValueError: if more than one filename listed for training mode. When we load
-        multiple datasets, we do not interleave between sets, which may cause
-        problems when training.
     ValueError: if <fname>.info does not exist for any files in fnames.
   """
+
   if mode == tf.estimator.ModeKeys.TRAIN and len(fnames) > 1:
-    tf.logging.warn('Please ensure that shuffle buffer is large enough to effectively'
-                    ' shuffle across all dataset input files.')
+    # Throwing this warning because we do not interleave files.
+    tf.logging.warn('Please ensure that shuffle buffer is large enough to'
+                    ' effectively shuffle across all dataset input files.')
 
   if not fnames:
     raise ValueError('Input list of filenames is empty.')
@@ -659,8 +657,8 @@ def load_training_spectra_array(spectra_array_path_name):
   Returns:
     np.array with shape (len(training_data), ms_constants.max_peak_loc)
   """
-  with tf.gfile.Open(spectra_array_path_name) as f:
-    spectra_array = np.load(f)
+  with tf.gfile.Open(spectra_array_path_name, 'rb') as f:
+    spectra_array = np.load(f, encoding='bytes')
 
   return spectra_array
 

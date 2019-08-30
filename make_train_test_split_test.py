@@ -31,12 +31,14 @@ import mass_spec_constants as ms_constants
 import parse_sdf_utils
 import test_utils
 import train_test_split_utils
+import six
 import tensorflow as tf
 
 
 class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
 
   def setUp(self):
+    super(MakeTrainTestSplitTest, self).setUp()
     test_data_directory = test_utils.test_dir('testdata/')
     self.temp_dir = tempfile.mkdtemp(dir=absltest.get_default_test_tmpdir())
     test_sdf_file_large = os.path.join(test_data_directory, 'test_14_mend.sdf')
@@ -51,11 +53,16 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
         self.mol_list_large)
     self.inchikey_dict_small = train_test_split_utils.make_inchikey_dict(
         self.mol_list_small)
-    self.inchikey_list_large = self.inchikey_dict_large.keys()
-    self.inchikey_list_small = self.inchikey_dict_small.keys()
+    self.inchikey_list_large = list(self.inchikey_dict_large.keys())
+    self.inchikey_list_small = list(self.inchikey_dict_small.keys())
 
   def tearDown(self):
     tf.gfile.DeleteRecursively(self.temp_dir)
+    super(MakeTrainTestSplitTest, self).tearDown()
+
+  def encode(self, value):
+    """Wrapper function for encoding strings in python 3."""
+    return test_utils.encode(value, six.PY3)
 
   def test_all_lists_mutually_exclusive(self):
     list1 = ['1', '2', '3']
@@ -67,13 +74,13 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
       pass
 
   def test_make_inchikey_dict(self):
-    self.assertEqual(len(self.inchikey_dict_large), 11)
-    self.assertEqual(len(self.inchikey_dict_small), 2)
+    self.assertLen(self.inchikey_dict_large, 11)
+    self.assertLen(self.inchikey_dict_small, 2)
 
   def test_make_mol_list_from_inchikey_dict(self):
     mol_list = train_test_split_utils.make_mol_list_from_inchikey_dict(
         self.inchikey_dict_large, self.inchikey_list_large)
-    self.assertItemsEqual(mol_list, self.mol_list_large)
+    self.assertCountEqual(mol_list, self.mol_list_large)
 
   def test_make_train_val_test_split_mol_lists(self):
     main_train_test_split = train_test_split_utils.TrainValTestFractions(
@@ -88,7 +95,7 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
 
     for expected_length, inchikey_list in zip(
         expected_lengths_of_inchikey_lists, inchikey_list_of_lists):
-      self.assertEqual(len(inchikey_list), expected_length)
+      self.assertLen(inchikey_list, expected_length)
 
     train_test_split_utils.assert_all_lists_mutally_exclusive(
         inchikey_list_of_lists)
@@ -103,7 +110,7 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
     expected_lengths_of_inchikey_lists = [3, 1, 2]
     for expected_length, inchikey_list in zip(
         expected_lengths_of_inchikey_lists, inchikey_list_of_lists):
-      self.assertEqual(len(inchikey_list), expected_length)
+      self.assertLen(inchikey_list, expected_length)
 
     train_test_split_utils.assert_all_lists_mutally_exclusive(
         inchikey_list_of_lists)
@@ -121,7 +128,7 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
     expected_lengths_of_inchikey_lists = [4, 2, 3]
     for expected_length, inchikey_list in zip(
         expected_lengths_of_inchikey_lists, holdout_inchikey_list_of_lists):
-      self.assertEqual(len(inchikey_list), expected_length)
+      self.assertLen(inchikey_list, expected_length)
 
     train_test_split_utils.assert_all_lists_mutally_exclusive(
         holdout_inchikey_list_of_lists)
@@ -137,13 +144,13 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
             holdout_inchikey_list=self.inchikey_list_small,
             splitting_type='diazo'))
 
-    self.assertItemsEqual(train_inchikeys, [
+    self.assertCountEqual(train_inchikeys, [
         'UFHFLCQGNIYNRP-UHFFFAOYSA-N', 'CCGKOQOJPYTBIH-UHFFFAOYSA-N',
         'ASTNYHRQIBTGNO-UHFFFAOYSA-N', 'UFHFLCQGNIYNRP-VVKOMZTBSA-N',
         'PVVBOXUQVSZBMK-UHFFFAOYSA-N'
     ])
 
-    self.assertItemsEqual(val_inchikeys + test_inchikeys, [
+    self.assertCountEqual(val_inchikeys + test_inchikeys, [
         'OWKPLCCVKXABQF-UHFFFAOYSA-N', 'COVPJOWITGLAKX-UHFFFAOYSA-N',
         'GKVDXUXIAHWQIK-UHFFFAOYSA-N', 'UCIXUAPVXAZYDQ-VMPITWQZSA-N'
     ])
@@ -243,10 +250,12 @@ class MakeTrainTestSplitTest(tf.test.TestCase, parameterized.TestCase):
           for library_fname in library_files
       ])
       # Check that info file has the correct length for the file.
-      self.assertEqual(len(inchikeys_from_file), length_from_info_file)
+      self.assertLen(inchikeys_from_file, length_from_info_file)
       # Check that the TF.Record contains all of the inchikeys in our list.
-      self.assertSetEqual(
-          set(inchikeys_from_file), set(self.inchikey_list_large))
+      inchikey_list_large = [
+          self.encode(ikey) for ikey in self.inchikey_list_large
+      ]
+      self.assertSetEqual(set(inchikeys_from_file), set(inchikey_list_large))
 
 
 if __name__ == '__main__':

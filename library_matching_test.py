@@ -18,7 +18,6 @@ from __future__ import division
 from __future__ import print_function
 
 
-from absl.testing import parameterized
 import feature_map_constants as fmap_constants
 import library_matching
 import similarity as similarity_lib
@@ -28,7 +27,7 @@ import tensorflow as tf
 PREDICTOR_INPUT_KEY = 'INPUT'
 
 
-class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
+class LibraryMatchingTest(tf.test.TestCase):
 
   def testCosineSimilarityProviderMatching(self):
     """Check correctness for querying the library with a library element."""
@@ -117,7 +116,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
     if prefix:
       prefix += '-'
 
-    return ['%s%d' % (prefix, uid) for uid in range(num_ids)]
+    return [('%s%d' % (prefix, uid)).encode('utf-8') for uid in range(num_ids)]
 
   def _random_fingerprint(self, num_elements):
     return tf.to_float(tf.random_uniform(shape=(num_elements, 1024)) > 0.5)
@@ -280,7 +279,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
 
     ids_observed = self.make_ids(3, 'obs')
     ids_predicted = self.make_ids(2, 'pred')
-    ids_query = np.array(['obs-0', 'obs-1', 'pred-1'])
+    ids_query = np.array([b'obs-0', b'obs-1', b'pred-1'])
     masses_observed = np.ones([3, 1], dtype=np.float32)
     masses_predicted = np.ones([2, 1], dtype=np.float32)
     masses_query = np.ones([3, 1], dtype=np.float32)
@@ -314,7 +313,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
 
     ids_observed = self.make_ids(3, 'obs')
     ids_predicted = self.make_ids(2, 'pred')
-    ids_query = np.array(['pred-0', 'obs-1', 'obs-2'])
+    ids_query = np.array([b'pred-0', b'obs-1', b'obs-2'])
     masses_observed = np.ones([3, 1], dtype=np.float32)
     masses_predicted = 2 * np.ones([2, 1], dtype=np.float32)
     masses_query = np.array([3, 1.5, 0], dtype=np.float32)[..., np.newaxis]
@@ -376,7 +375,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
     ids_observed = self.make_ids(3)
     ids_query = self.make_ids(3)
 
-    expected_predictions = ['0', '2', '0']
+    expected_predictions = [b'0', b'2', b'0']
 
     masses_query = np.ones([3, 1], dtype=np.float32)
     query_data = self._package_data(
@@ -410,7 +409,7 @@ class LibraryMatchingTest(tf.test.TestCase, parameterized.TestCase):
     ids_predicted = self.make_ids(2)
     ids_query = self.make_ids(3)
 
-    expected_predictions = ['0', '1', '0']
+    expected_predictions = [b'0', b'1', b'0']
 
     masses_query = np.ones([3, 1], dtype=np.float32)
     query_data = self._package_data(

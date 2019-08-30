@@ -91,6 +91,7 @@ class MoleculeEstimatorTest(tf.test.TestCase, parameterized.TestCase):
 
   def tearDown(self):
     tf.gfile.DeleteRecursively(self.temp_dir)
+    super(MoleculeEstimatorTest, self).tearDown()
 
   def _get_loss_history(self, checkpoint_dir):
     """Get list of train losses from events file."""
