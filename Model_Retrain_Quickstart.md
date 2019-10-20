@@ -20,7 +20,7 @@ To train a model:
 
 ```
 python molecule_estimator.py
---dataset_config_file=~/spectra_tf_records/query_replicates_val_predicted_replicates_val.json
+--dataset_config_file=$TARGET_PATH_NAME/spectra_tf_records/query_replicates_val_predicted_replicates_val.json
 --train_steps=1000 \\ \
 --model_dir=$TARGET_PATH_NAME/models/output --hparams=make_spectra_plots=True
 --alsologtostderr
@@ -39,8 +39,8 @@ To predict spectra for new data given a model, run:
 ```
 python make_predictions_from_tfrecord.py \
 --input_file=testdata/test_14_record.gz \
---output_file=/tmp/models/output_predictions \
---model_checkpoint_path=/tmp/models/output/ \
+--output_file=$TARGET_PATH_NAME/models/output_predictions \
+--model_checkpoint_path=$TARGET_PATH_NAME/models/output/ \
 --hparams=eval_batch_size=16 \
 --alsologtostderr
 ```
