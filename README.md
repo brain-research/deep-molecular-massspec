@@ -26,7 +26,9 @@ our model. This task is described in more detail below.
 
 It is recommended to use [Anaconda](https://www.anaconda.com/distribution/) with a Python 3.6 environment to install these packages.
 -   [RDKit](https://www.rdkit.org/docs/Install.html)
--   [Tensorflow](https://www.tensorflow.org/install)
+-   [Tensorflow](https://www.tensorflow.org/install) 
+
+Most of the packages required here can be installed with conda install tensorflow=1.13.2 rdkit matplotlib and pip install abls-py.
 
 ## Quickstart Guide for Making Model Predictions
 
