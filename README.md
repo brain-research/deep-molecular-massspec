@@ -52,6 +52,12 @@ $ python make_spectra_prediction.py \
 --weights_dir=$MODEL_WEIGHTS_DIR/massspec_weights
 ```
 
+## Validation and Test set for benchmarking
+The molecules used for the validation and test sets can be found under the
+directory *validation_test_split_molecules*. The molecules are provided in
+inchikey and smiles format.
+
+
 ## To cite this work:
 
 @article{doi:10.1021/acscentsci.9b00085,\
