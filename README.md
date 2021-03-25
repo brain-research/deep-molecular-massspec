@@ -28,7 +28,7 @@ It is recommended to use [Anaconda](https://www.anaconda.com/distribution/) with
 -   [RDKit](https://www.rdkit.org/docs/Install.html)
 -   [Tensorflow](https://www.tensorflow.org/install) 
 
-Most of the packages required here can be installed with conda install tensorflow=1.13.2 rdkit matplotlib and pip install absl-py.
+Most of the packages required here can be installed with conda install tensorflow=1.13 rdkit matplotlib and pip install absl-py.
 
 ## Quickstart Guide for Making Model Predictions
 
